@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DDM.API.Infrastructure\DDM.API.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DTOs\v2\" />
+    <Folder Include="Features\" />
+    <Folder Include="Exceptions\" />
+    <Folder Include="ProfileMapping\v2\" />
+    <Folder Include="ProfileMapping\v1\" />
+    <Folder Include="Services\v2\" />
+  </ItemGroup>
+
+</Project>
