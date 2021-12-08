@@ -12,7 +12,7 @@ namespace DDM.API.Infrastructure.Data.Identiity
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string MobileNumber { get; set; }
-        public DateTime LastLogin { get; set; }
+        public DateTime? LastLogin { get; set; }
         public ICollection<ApplicationUserRole> UserRoles { get; set; }
     }
 

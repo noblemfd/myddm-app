@@ -8,48 +8,62 @@ namespace DDM.API.Infrastructure.Helpers
 {
     public class EnumList
     {
-        public enum Roles
+        public enum Roles : byte
         {
             Admin = 1,
             Merchant = 2,
             Staff = 3,
         }
 
-        public enum MerchantStatus
+        public enum MerchantStatus : byte
         {
             Inactive = 0,
             Active = 1
         }
-        public enum ChargeMode
+        public enum ChargeMode : byte
         {
             None = 0,
             Fixed = 1,
             Percentage = 2
         }
-        public enum ChargeRequired
+        public enum ChargeRequired : byte
         {
             False = 0,
             True = 1
         }
 
-        public enum NotificationRequired
+        public enum NotificationResponse : byte
         {
-            False = 0,
-            True = 1
+            None = 0,
+            Rejected = 1,
+            Accepted = 2
         }
-        public enum WhoToCharge
+
+        public enum NotificationType : byte
         {
             None = 0,
             Merchant = 1,
             Customer = 2
         }
-        public enum PaymentFrequency
+
+        public enum NotificationRequired : byte
+        {
+            False = 0,
+            True = 1
+        }
+        public enum WhoToCharge : byte
+        {
+            None = 0,
+            Merchant = 1,
+            Customer = 2
+        }
+        public enum PaymentFrequency : byte
         {
             Monthly = 1,
             Merchant = 2,
             Customer = 3
         }
-        public enum MandateStatus
+        public enum MandateStatus : byte
         {
             Pending = 0,
             Failed = 1,

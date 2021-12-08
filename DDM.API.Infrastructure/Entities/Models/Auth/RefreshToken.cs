@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DDM.API.Infrastructure.Entities.Models.Auth
 {
-    public class RefreshToken : BaseEntity
+    public class RefreshToken : AuditableBaseEntity
     {
         public long UserId { get; set; }
         public string Token { get; set; }

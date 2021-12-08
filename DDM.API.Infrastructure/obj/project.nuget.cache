@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "I7zhTa4ZqGeGBYJpr7+0ChPZ3bqx6RPqgaZ5a+aMjD9FTffDeH5TP/14ClXMTfsc6sZoehZAePj46G7oyGxL0A==",
+  "dgSpecHash": "imkBQbQ1nOhkGQ3rFOAFvBya6onDXT5nKD44nXETytJBahpWnu+YggMhZ2lvUK+sRKuIiBnAp63MsbsSZdJQyg==",
   "success": true,
   "projectFilePath": "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\DDM.API.Infrastructure.csproj",
   "expectedPackageFiles": [
@@ -15,7 +15,7 @@
     "C:\\Users\\MIKE\\.nuget\\packages\\microsoft.aspnetcore.dataprotection.abstractions\\2.2.0\\microsoft.aspnetcore.dataprotection.abstractions.2.2.0.nupkg.sha512",
     "C:\\Users\\MIKE\\.nuget\\packages\\microsoft.aspnetcore.hosting.abstractions\\2.2.0\\microsoft.aspnetcore.hosting.abstractions.2.2.0.nupkg.sha512",
     "C:\\Users\\MIKE\\.nuget\\packages\\microsoft.aspnetcore.hosting.server.abstractions\\2.2.0\\microsoft.aspnetcore.hosting.server.abstractions.2.2.0.nupkg.sha512",
-    "C:\\Users\\MIKE\\.nuget\\packages\\microsoft.aspnetcore.http\\2.2.0\\microsoft.aspnetcore.http.2.2.0.nupkg.sha512",
+    "C:\\Users\\MIKE\\.nuget\\packages\\microsoft.aspnetcore.http\\2.2.2\\microsoft.aspnetcore.http.2.2.2.nupkg.sha512",
     "C:\\Users\\MIKE\\.nuget\\packages\\microsoft.aspnetcore.http.abstractions\\2.2.0\\microsoft.aspnetcore.http.abstractions.2.2.0.nupkg.sha512",
     "C:\\Users\\MIKE\\.nuget\\packages\\microsoft.aspnetcore.http.extensions\\2.2.0\\microsoft.aspnetcore.http.extensions.2.2.0.nupkg.sha512",
     "C:\\Users\\MIKE\\.nuget\\packages\\microsoft.aspnetcore.http.features\\2.2.0\\microsoft.aspnetcore.http.features.2.2.0.nupkg.sha512",

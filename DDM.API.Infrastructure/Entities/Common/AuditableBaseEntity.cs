@@ -10,11 +10,19 @@ namespace DDM.API.Infrastructure.Entities.Common
 {
     public abstract class AuditableBaseEntity
     {
-        //[Key]
+        [Key]
         public long Id { get; set; }
         public string CreatedBy { get; set; }
+
+        [DataType(DataType.DateTime)]
         public DateTime? CreatedDate { get; set; }
+
         public string LastUpdatedBy { get; set; }
+
+        [DataType(DataType.DateTime)]
         public DateTime? LastUpdatedDate { get; set; }
+
+        [JsonIgnore]
+        public bool? IsDeleted { get; set; }
     }
 }
