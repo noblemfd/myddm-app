@@ -1,0 +1,15 @@
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Infrastructure\bin\Debug\net5.0\DDM.API.Infrastructure.deps.json
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Infrastructure\bin\Debug\net5.0\DDM.API.Infrastructure.runtimeconfig.json
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Infrastructure\bin\Debug\net5.0\DDM.API.Infrastructure.runtimeconfig.dev.json
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Infrastructure\bin\Debug\net5.0\DDM.API.Infrastructure.dll
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Infrastructure\bin\Debug\net5.0\ref\DDM.API.Infrastructure.dll
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Infrastructure\bin\Debug\net5.0\DDM.API.Infrastructure.pdb
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Infrastructure\obj\Debug\net5.0\DDM.API.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Infrastructure\obj\Debug\net5.0\DDM.API.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Infrastructure\obj\Debug\net5.0\DDM.API.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Infrastructure\obj\Debug\net5.0\DDM.API.Infrastructure.AssemblyInfo.cs
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Infrastructure\obj\Debug\net5.0\DDM.API.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Infrastructure\obj\Debug\net5.0\DDM.API.Infrastructure.dll
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Infrastructure\obj\Debug\net5.0\ref\DDM.API.Infrastructure.dll
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Infrastructure\obj\Debug\net5.0\DDM.API.Infrastructure.pdb
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Infrastructure\obj\Debug\net5.0\DDM.API.Infrastructure.genruntimeconfig.cache
