@@ -1,6 +1,7 @@
 ﻿using DDM.API.Infrastructure.Entities.Common;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -23,8 +24,11 @@ namespace DDM.API.Infrastructure.Entities.Models
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string RawData { get; set; }
-        public PaymentFrequency? PaymentFrequncy { get; set; }      //1=Monthly, 2=Quarterly, 3=Yearly
+        public PaymentFrequency? PaymentFrequency { get; set; }      //1=Monthly, 2=Quarterly, 3=Yearly
         public int? PaymentCount { get; set; }      //4, or 3 based on PaymentFrequency
+
+        [DefaultValue(false)]
+        public bool? IsApproved { get; set; }
 
         [Display(Name = "Amount")]
         [DataType(DataType.Currency)]

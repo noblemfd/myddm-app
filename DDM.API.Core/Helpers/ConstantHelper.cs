@@ -41,5 +41,9 @@ namespace DDM.API.Core.Helpers
             }
             return Math.Abs(years);
         }
+        public static int ConvertDateToInt(DateTime date)
+        {
+            return (date.Year * 10000) + (date.Month * 100) + (date.Day);
+        }
     }
 }

@@ -72,3 +72,10 @@ C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Web\obj\Debug\net5.0\DD
 C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Web\obj\Debug\net5.0\ref\DDM.API.Web.dll
 C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Web\obj\Debug\net5.0\DDM.API.Web.pdb
 C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Web\obj\Debug\net5.0\DDM.API.Web.genruntimeconfig.cache
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Web\bin\Debug\net5.0\Microsoft.AspNetCore.JsonPatch.dll
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Web\bin\Debug\net5.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Web\bin\Debug\net5.0\Microsoft.AspNetCore.Mvc.Versioning.dll
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Web\bin\Debug\net5.0\Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer.dll
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Web\bin\Debug\net5.0\Microsoft.Extensions.PlatformAbstractions.dll
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Web\bin\Debug\net5.0\Newtonsoft.Json.dll
+C:\Users\MIKE\Desktop\DirectDebitMandate\DDM-API\DDM.API.Web\bin\Debug\net5.0\Newtonsoft.Json.Bson.dll

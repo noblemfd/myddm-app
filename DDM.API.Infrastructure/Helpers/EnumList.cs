@@ -60,8 +60,8 @@ namespace DDM.API.Infrastructure.Helpers
         public enum PaymentFrequency : byte
         {
             Monthly = 1,
-            Merchant = 2,
-            Customer = 3
+            Quarterly = 2,
+            Yearly = 3
         }
         public enum MandateStatus : byte
         {

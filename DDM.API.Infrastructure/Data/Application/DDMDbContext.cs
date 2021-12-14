@@ -29,9 +29,11 @@ namespace DDM.API.Infrastructure.Data.Application
         public DbSet<StaffMember> zib_staff_members { get; set; }
         public DbSet<NotificationLog> zib_notification_logs { get; set; }
         public DbSet<TransactionLog> zib_transaction_logs { get; set; }
-        public DbSet<Log> zib_logs { get; set; }
+        public DbSet<TokenLog> zib_logs { get; set; }
         public DbSet<RefreshToken> zib_refresh_tokens { get; set; }
         public DbSet<AuditTrail> zib_audit_trails { get; set; }
+        public DbSet<ApplicationRole> ApplicationRole { get; set; }
+        public DbSet<ApplicationUserRole> ApplicationUserRole { get; set; }
 
         //Dedails About Under Method-https://entityframework.net/knowledge-base/39798317/identityuserlogin-string---requires-a-primary-key-to-be-defined-error-while-adding-migration
         protected override void OnModelCreating(ModelBuilder builder)
@@ -43,11 +45,17 @@ namespace DDM.API.Infrastructure.Data.Application
                 entity.Property(u => u.Id).ValueGeneratedOnAdd();
                 entity.HasIndex(u => u.Email).IsUnique();
                 entity.HasIndex(u => u.UserName).IsUnique();
-                entity.Property(u => u.EmailConfirmed).IsRequired(false);
-                entity.Property(u => u.PhoneNumberConfirmed).IsRequired(false);
-                entity.Property(u => u.TwoFactorEnabled).IsRequired(false);
-                entity.Property(u => u.LockoutEnabled).IsRequired(false);
-                entity.Property(u => u.AccessFailedCount).IsRequired(false);
+                entity.Ignore(u => u.AccessFailedCount);
+                entity.Ignore(u => u.LockoutEnabled);
+                entity.Ignore(u => u.TwoFactorEnabled);
+                entity.Ignore(u => u.ConcurrencyStamp);
+                entity.Ignore(u => u.LockoutEnd);
+                entity.Ignore(u => u.EmailConfirmed);
+                entity.Ignore(u => u.TwoFactorEnabled);
+                entity.Ignore(u => u.LockoutEnd);
+                entity.Ignore(u => u.AccessFailedCount);
+                entity.Ignore(u => u.PhoneNumberConfirmed);
+                entity.Property(u => u.IsDeleted).HasDefaultValue(false);
             });
             builder.Entity<ApplicationRole>(entity =>
             {
@@ -77,6 +85,7 @@ namespace DDM.API.Infrastructure.Data.Application
                 entity.Property(m => m.ChargeRequired).HasDefaultValue((ChargeRequired)0);
                 entity.HasIndex(m => m.MerchantName).IsUnique();
                 entity.HasIndex(m => m.AccountNumber).IsUnique();
+                entity.Property(m => m.IsDeleted).HasDefaultValue(false);
                 entity.Property(m => m.CreatedDate).HasColumnType("datetime");
                 entity.Property(m => m.LastUpdatedDate).HasColumnType("datetime");
             });
@@ -87,6 +96,8 @@ namespace DDM.API.Infrastructure.Data.Application
                 entity.Property(m => m.StartDate).HasColumnType("date");
                 entity.Property(m => m.EndDate).HasColumnType("date");
                 entity.Property(m => m.DueDate).HasColumnType("date");
+                entity.Property(m => m.IsApproved).HasDefaultValue(false);
+                entity.Property(m => m.IsDeleted).HasDefaultValue(false);
                 entity.Property(m => m.CreatedDate).HasColumnType("datetime");
                 entity.Property(m => m.LastUpdatedDate).HasColumnType("datetime");
             });
@@ -98,6 +109,7 @@ namespace DDM.API.Infrastructure.Data.Application
                 entity.Property(m => m.StartDate).HasColumnType("date");
                 entity.Property(m => m.EndDate).HasColumnType("date");
                 entity.Property(m => m.DueDate).HasColumnType("date");
+                entity.Property(m => m.IsDeleted).HasDefaultValue(false);
                 entity.Property(m => m.CreatedDate).HasColumnType("datetime");
                 entity.Property(m => m.LastUpdatedDate).HasColumnType("datetime");
             });
@@ -107,12 +119,14 @@ namespace DDM.API.Infrastructure.Data.Application
                 entity.Property(n => n.NotificationResponse).HasDefaultValue((NotificationResponse)1);
                 entity.Property(n => n.NotificationType).HasDefaultValue((NotificationType)1);
                 entity.Property(n => n.IsRead).HasDefaultValue(false);
+                entity.Property(n => n.IsDeleted).HasDefaultValue(false);
                 entity.Property(n => n.CreatedDate).HasColumnType("datetime");
                 entity.Property(n => n.LastUpdatedDate).HasColumnType("datetime");
             });
             builder.Entity<TransactionLog>(entity =>
             {
                 entity.Property(t => t.Id).ValueGeneratedOnAdd();
+                entity.Property(t => t.IsDeleted).HasDefaultValue(false);
                 entity.Property(t => t.CreatedDate).HasColumnType("datetime");
                 entity.Property(t => t.LastUpdatedDate).HasColumnType("datetime");
             });
@@ -120,24 +134,28 @@ namespace DDM.API.Infrastructure.Data.Application
             {
                 entity.Property(m => m.Id).ValueGeneratedOnAdd();
                 entity.Property(m => m.IsAdmin).HasDefaultValue(false);
+                entity.Property(m => m.IsDeleted).HasDefaultValue(false);
                 entity.Property(m => m.CreatedDate).HasColumnType("datetime");
                 entity.Property(m => m.LastUpdatedDate).HasColumnType("datetime");
             });
-            builder.Entity<Log>(entity =>
+            builder.Entity<TokenLog>(entity =>
             {
                 entity.Property(l => l.Id).ValueGeneratedOnAdd();
+                entity.Property(l => l.IsDeleted).HasDefaultValue(false);
                 entity.Property(l => l.CreatedDate).HasColumnType("datetime");
                 entity.Property(l => l.LastUpdatedDate).HasColumnType("datetime");
             });
             builder.Entity<RefreshToken>(entity =>
             {
                 entity.Property(t => t.Id).ValueGeneratedOnAdd();
+                entity.Property(t => t.IsDeleted).HasDefaultValue(false);
                 entity.Property(t => t.CreatedDate).HasColumnType("datetime");
                 entity.Property(t => t.LastUpdatedDate).HasColumnType("datetime");
             });
             builder.Entity<AuditTrail>(entity =>
             {
                 entity.Property(t => t.Id).ValueGeneratedOnAdd();
+                entity.Property(t => t.IsDeleted).HasDefaultValue(false);
                 entity.Property(t => t.CreatedDate).HasColumnType("datetime");
                 entity.Property(t => t.LastUpdatedDate).HasColumnType("datetime");
             });
@@ -148,7 +166,7 @@ namespace DDM.API.Infrastructure.Data.Application
             {
                 // EF Core 5
                 property.SetPrecision(18);
-                property.SetScale(6);
+                property.SetScale(2);
             }
         }
         public override int SaveChanges()

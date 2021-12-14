@@ -9,11 +9,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\v1\Merchant\" />
     <Folder Include="DTOs\v2\" />
     <Folder Include="Features\" />
     <Folder Include="Exceptions\" />
-    <Folder Include="ProfileMapping\v2\" />
+    <Folder Include="EntityMapper\v2\" />
     <Folder Include="Services\v2\" />
   </ItemGroup>
 
@@ -29,6 +28,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="X.PagedList" Version="8.1.0" />
   </ItemGroup>
 
 </Project>

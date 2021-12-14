@@ -10,7 +10,7 @@ namespace DDM.API.Core.DTOs.v1.Authentication
     public class LoginRequestDto
     {
         [Required(ErrorMessage = "The Username is required!")]
-        public string Email { get; set; }
+        public string UserName { get; set; }
 
         [Required(ErrorMessage = "The password is required!")]
         public string Password { get; set; }

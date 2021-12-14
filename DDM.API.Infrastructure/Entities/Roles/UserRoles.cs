@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DDM.API.Infrastructure.Entities.Roles
 {
-    public class UserRoles
+    public static class UserRoles
     {
         public const string Admin = "Admin";
         public const string Merchant = "Merchant";

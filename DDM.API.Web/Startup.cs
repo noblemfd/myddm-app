@@ -1,11 +1,17 @@
+using DDM.API.Core.Services.v1.Abstract;
+using DDM.API.Core.Services.v1.Concrete;
 using DDM.API.Infrastructure.Data.Application;
 using DDM.API.Infrastructure.Data.Identiity;
 using DDM.API.Infrastructure.Entities.Roles;
+using DDM.API.Web.Helpers.Extensions;
+using DDM.API.Web.Helpers.Filters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -32,15 +38,13 @@ namespace DDM.API.Web
         {
 
             services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "DDM.API.Web", Version = "v1" });
-            });
-
-            // Identity
-            services.AddIdentity<ApplicationUser, ApplicationRole>()
-                .AddEntityFrameworkStores<DDMDbContext>()
-                .AddDefaultTokenProviders();
+            services.AddDb(Configuration);
+            services.AddJwtAuthentication(Configuration);
+            services.AddMvcCoreFramework(Configuration);
+         //   services.AddAppServices(Configuration);
+            services.AddAppAuthorization(Configuration);
+            services.AddVersioning();
+            services.AddSwagger();
 
             // Authentication
 
@@ -50,41 +54,47 @@ namespace DDM.API.Web
             services.AddAutoMapper(typeof(Startup));
 
             // Dependency Injection
-            //services.AddScoped<IAuthService, AuthService>();
-            //services.AddScoped<IEmployeeService, EmployeeService>();
-            //services.AddScoped<IJobService, JobService>();
-            //services.AddScoped<IOrganizationService, OrganizationService>();
-            //services.AddScoped<IDepartmentService, DepartmentService>();
-            //services.AddScoped<ISalaryService, SalaryService>();
-            //services.AddScoped<IEmployeeLeaveService, EmployeeLeaveService>();
-            //services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IAdminService, AdminService>();
+            //services.AddScoped<IMerchantService, MerchantService>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // CORS (not safe but what the hell)
+
+            // Routing to Lowercase
+            services.AddRouting(options => options.LowercaseUrls = true);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider, IApiVersionDescriptionProvider provider)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "DDM.API.Web v1"));
             }
-
+            else
+            {
+                app.UseHsts();
+            }
+            app.UseVersionedSwagger(provider);
+            //Enable CORS
+            app.UseCors("AllowAllOrigins");
+            //   app.UseCors("AllowAll");
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
-
+            //app.UseStaticFiles();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                //endpoints.MapControllers();
+                endpoints.MapControllerRoute(
+                   name: "default",
+                   pattern: "{controller}/{action=Index}/{id?}");
             });
 
             //DB Seeding
-            CreateRoles(serviceProvider);
+            //CreateRoles(serviceProvider);
             // DDMDbInitializer.SeedRoles(app).Wait();
         }
 

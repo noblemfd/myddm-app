@@ -29,9 +29,9 @@ namespace DDM.API.Infrastructure.Entities.Models
         [DefaultValue(false)]
         public bool? IsNotified { get; set; }
 
-        [Display(Name = "Amount")]
+        [Display(Name = "Payable Amount")]
         [DataType(DataType.Currency)]
-        public decimal? Amount { get; set; }
+        public decimal? PayableAmount { get; set; }
         public string PostingReference { get; set; }
         public string ProcessedBy { get; set; }
         public DateTime ProcessedDate { get; set; }

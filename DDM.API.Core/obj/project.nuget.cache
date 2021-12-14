@@ -1,12 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "Q8gQ8HKcJPyqVRE3MK3q4FdoRejgunqlB7FAOKZNAotmWBj2qf1mAkbtDeXAS7GFo+b7zDGwfV+MS7F4gINxGg==",
+  "dgSpecHash": "0GqQqboGZmM26w1iGzl2x1y/DpyiN7ptqKz62sex9WlMhJl/cdGPNZVRLHIYNqobKjO31VvUm1ckj8PGSvNrmQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Core\\DDM.API.Core.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\MIKE\\.nuget\\packages\\automapper\\10.1.1\\automapper.10.1.1.nupkg.sha512",
     "C:\\Users\\MIKE\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\8.1.1\\automapper.extensions.microsoft.dependencyinjection.8.1.1.nupkg.sha512",
     "C:\\Users\\MIKE\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
+    "C:\\Users\\MIKE\\.nuget\\packages\\jetbrains.annotations\\2021.1.0\\jetbrains.annotations.2021.1.0.nupkg.sha512",
     "C:\\Users\\MIKE\\.nuget\\packages\\microsoft.aspnetcore.authentication\\2.2.0\\microsoft.aspnetcore.authentication.2.2.0.nupkg.sha512",
     "C:\\Users\\MIKE\\.nuget\\packages\\microsoft.aspnetcore.authentication.abstractions\\2.2.0\\microsoft.aspnetcore.authentication.abstractions.2.2.0.nupkg.sha512",
     "C:\\Users\\MIKE\\.nuget\\packages\\microsoft.aspnetcore.authentication.cookies\\2.2.0\\microsoft.aspnetcore.authentication.cookies.2.2.0.nupkg.sha512",
@@ -127,6 +128,7 @@
     "C:\\Users\\MIKE\\.nuget\\packages\\system.xml.xdocument\\4.3.0\\system.xml.xdocument.4.3.0.nupkg.sha512",
     "C:\\Users\\MIKE\\.nuget\\packages\\system.xml.xmldocument\\4.3.0\\system.xml.xmldocument.4.3.0.nupkg.sha512",
     "C:\\Users\\MIKE\\.nuget\\packages\\system.xml.xmlserializer\\4.3.0\\system.xml.xmlserializer.4.3.0.nupkg.sha512",
+    "C:\\Users\\MIKE\\.nuget\\packages\\x.pagedlist\\8.1.0\\x.pagedlist.8.1.0.nupkg.sha512",
     "C:\\Users\\MIKE\\.nuget\\packages\\microsoft.netcore.app.ref\\5.0.0\\microsoft.netcore.app.ref.5.0.0.nupkg.sha512"
   ],
   "logs": []
