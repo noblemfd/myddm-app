@@ -35,6 +35,34 @@ namespace DDM.API.Core.Services.v1.Concrete
             _roleManager = roleManager;
           //  _userResolverService = userResolverService;
         }
+        public async Task<GenericResponseDto<AdminUserDto>> CreateAdminUserAsync(AdminCreateDto requestDto)
+        {
+            var response = new GenericResponseDto<AdminUserDto>();
+            var existingUser = await _userManager.FindByNameAsync(requestDto.UserName);
+            if (existingUser == null)
+            {
+                var user = _mapper.Map<ApplicationUser>(requestDto);
+                user.SecurityStamp = Guid.NewGuid().ToString();
+                var result = await _userManager.CreateAsync(user, requestDto.Password);
+
+                if (!result.Succeeded)
+                {
+                    var error = string.Join<IdentityError>(", ", result.Errors.ToArray());
+                    response.Error = new ErrorResponseDto { ErrorCode = 500, Message = "Failed to create user because of the following errors: " + error };
+                }
+                else
+                {
+                    response.StatusCode = 200;
+                    response.Result = _mapper.Map<AdminUserDto>(user);
+                }
+            }
+            else
+            {
+                response.Error = new ErrorResponseDto { ErrorCode = 400, Message = "This Username is already registered!" };
+                response.StatusCode = 400;
+            }
+            return response;
+        }
 
         public async Task<GenericResponseDto<AllMerchantListDto>> CreateMerchantAsync(MerchantCreateDto requestDto)
         {
@@ -56,11 +84,11 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     MobileNumber = requestDto.MobileNumber,
                     UserName = requestDto.UserName,
-                    PasswordHash = "@SecretPassword123",
+                   // PasswordHash = "@SecretPassword123",
                 };
 
-                //  var result = await _userManager.CreateAsync(merchantUser, "@SecretPassword123");
-                var result = await _userManager.CreateAsync(merchantUser);
+                  var result = await _userManager.CreateAsync(merchantUser, "@SecretPassword123");
+              //  var result = await _userManager.CreateAsync(merchantUser);
 
                 if (result.Succeeded)
                 {

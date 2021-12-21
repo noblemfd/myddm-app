@@ -1,22 +1,26 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\DDM.API.Infrastructure.csproj": {}
+    "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\DDM.API.Infrastructure.csproj": {}
   },
   "projects": {
-    "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\DDM.API.Infrastructure.csproj": {
+    "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\DDM.API.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\DDM.API.Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\DDM.API.Infrastructure.csproj",
         "projectName": "DDM.API.Infrastructure",
-        "projectPath": "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\DDM.API.Infrastructure.csproj",
-        "packagesPath": "C:\\Users\\MIKE\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\obj\\",
+        "projectPath": "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\DDM.API.Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
+        ],
         "configFilePaths": [
-          "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\NuGet.Config",
-          "C:\\Users\\MIKE\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\NuGet.Config",
+          "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net5.0"
@@ -62,6 +66,10 @@
               "target": "Package",
               "version": "[5.0.12, )"
             },
+            "Microsoft.EntityFrameworkCore.Relational": {
+              "target": "Package",
+              "version": "[5.0.12, )"
+            },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
               "version": "[5.0.12, )"
@@ -71,6 +79,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[5.0.12, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.1, )"
             }
           },
           "imports": [
@@ -83,18 +95,12 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[5.0.0, 5.0.0]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.403\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
         }
       }
     }

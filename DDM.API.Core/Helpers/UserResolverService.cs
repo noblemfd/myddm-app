@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,7 +22,9 @@ namespace DDM.API.Core.Helpers
         }
         public string GetUserId()
         {
-            var userId = _userManager.GetUserId(_httpContext.HttpContext.User);
+            //var userId = _userManager.GetUserId(_httpContext.HttpContext.User);
+            var user = _httpContext?.HttpContext?.User as ClaimsPrincipal;
+            var userId = user.Claims.ElementAt(0).Value;
             return userId;
         }
 

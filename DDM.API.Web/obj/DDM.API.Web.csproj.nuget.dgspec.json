@@ -1,22 +1,26 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Web\\DDM.API.Web.csproj": {}
+    "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Web\\DDM.API.Web.csproj": {}
   },
   "projects": {
-    "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Core\\DDM.API.Core.csproj": {
+    "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Core\\DDM.API.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Core\\DDM.API.Core.csproj",
+        "projectUniqueName": "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Core\\DDM.API.Core.csproj",
         "projectName": "DDM.API.Core",
-        "projectPath": "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Core\\DDM.API.Core.csproj",
-        "packagesPath": "C:\\Users\\MIKE\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Core\\obj\\",
+        "projectPath": "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Core\\DDM.API.Core.csproj",
+        "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Core\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
+        ],
         "configFilePaths": [
-          "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\NuGet.Config",
-          "C:\\Users\\MIKE\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\NuGet.Config",
+          "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net5.0"
@@ -28,8 +32,8 @@
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\DDM.API.Infrastructure.csproj": {
-                "projectPath": "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\DDM.API.Infrastructure.csproj"
+              "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\DDM.API.Infrastructure.csproj": {
+                "projectPath": "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\DDM.API.Infrastructure.csproj"
               }
             }
           }
@@ -78,6 +82,10 @@
               "target": "Package",
               "version": "[5.0.12, )"
             },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.1, )"
+            },
             "X.PagedList": {
               "target": "Package",
               "version": "[8.1.0, )"
@@ -93,34 +101,32 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[5.0.0, 5.0.0]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.403\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\DDM.API.Infrastructure.csproj": {
+    "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\DDM.API.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\DDM.API.Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\DDM.API.Infrastructure.csproj",
         "projectName": "DDM.API.Infrastructure",
-        "projectPath": "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\DDM.API.Infrastructure.csproj",
-        "packagesPath": "C:\\Users\\MIKE\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\obj\\",
+        "projectPath": "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\DDM.API.Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
+        ],
         "configFilePaths": [
-          "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\NuGet.Config",
-          "C:\\Users\\MIKE\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\NuGet.Config",
+          "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net5.0"
@@ -166,6 +172,10 @@
               "target": "Package",
               "version": "[5.0.12, )"
             },
+            "Microsoft.EntityFrameworkCore.Relational": {
+              "target": "Package",
+              "version": "[5.0.12, )"
+            },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
               "version": "[5.0.12, )"
@@ -175,6 +185,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[5.0.12, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.1, )"
             }
           },
           "imports": [
@@ -187,34 +201,32 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[5.0.0, 5.0.0]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.403\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Web\\DDM.API.Web.csproj": {
+    "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Web\\DDM.API.Web.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Web\\DDM.API.Web.csproj",
+        "projectUniqueName": "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Web\\DDM.API.Web.csproj",
         "projectName": "DDM.API.Web",
-        "projectPath": "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Web\\DDM.API.Web.csproj",
-        "packagesPath": "C:\\Users\\MIKE\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Web\\obj\\",
+        "projectPath": "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Web\\DDM.API.Web.csproj",
+        "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Web\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
+        ],
         "configFilePaths": [
-          "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\NuGet.Config",
-          "C:\\Users\\MIKE\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\NuGet.Config",
+          "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net5.0"
@@ -226,8 +238,8 @@
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Core\\DDM.API.Core.csproj": {
-                "projectPath": "C:\\Users\\MIKE\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Core\\DDM.API.Core.csproj"
+              "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Core\\DDM.API.Core.csproj": {
+                "projectPath": "C:\\Users\\HP\\Desktop\\DirectDebitMandate\\DDM-API\\DDM.API.Core\\DDM.API.Core.csproj"
               }
             }
           }
@@ -284,6 +296,10 @@
               "target": "Package",
               "version": "[5.0.12, )"
             },
+            "Microsoft.EntityFrameworkCore.Relational": {
+              "target": "Package",
+              "version": "[5.0.12, )"
+            },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
               "version": "[5.0.12, )"
@@ -317,12 +333,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[5.0.0, 5.0.0]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -331,7 +341,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.403\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
         }
       }
     }

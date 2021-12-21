@@ -15,6 +15,7 @@ using DDM.API.Infrastructure.Entities.DTOs;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
+//using Microsoft.AspNetCore.Http;
 
 namespace DDM.API.Core.Services.v1.Concrete
 {
@@ -44,7 +45,10 @@ namespace DDM.API.Core.Services.v1.Concrete
 
         public async Task<GenericResponseDto<object>> LoginUser(LoginRequestDto request)
         {
+            //var httpContext = new HttpContextAccessor();
             var user = await _userManager.FindByNameAsync(request.UserName);
+            var role = await _userManager.GetRolesAsync(user);
+            //var username = httpContext.HttpContext.User.Identity.Name;
             var response = new GenericResponseDto<object>();
 
             if (user != null && await _userManager.CheckPasswordAsync(user, request.Password))
@@ -72,6 +76,8 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(token),
                     user = _mapper.Map<UserDto>(user),
+                    role,
+                    //username,
                     expires = token.ValidTo
                 };
                 response.StatusCode = 200;

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+//using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace DDM.API.Web.Controllers.v1
@@ -30,6 +31,7 @@ namespace DDM.API.Web.Controllers.v1
         [HttpPost("login")]
         public async Task<ActionResult<GenericResponseDto<object>>> Login(LoginRequestDto loginRequest)
         {
+            //var httpContext = new HttpContextAccessor();
             var response = await _authService.LoginUser(loginRequest);
             Response.StatusCode = response.StatusCode ?? StatusCodes.Status200OK;
             return new JsonResult(response);
@@ -40,8 +42,8 @@ namespace DDM.API.Web.Controllers.v1
         public async Task<ActionResult<GenericResponseDto<UserDto>>> CurrentProfile()
         {
             var httpContext = new HttpContextAccessor();
+            //var userId = httpContext.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var username = httpContext.HttpContext.User.Identity.Name;
-
             var response = await _authService.GetCurrentUserAsync(username);
             Response.StatusCode = response.StatusCode ?? StatusCodes.Status200OK;
             return new JsonResult(response);

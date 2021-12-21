@@ -13,6 +13,7 @@ namespace DDM.API.Core.Services.v1.Abstract
 {
     public interface IAdminService
     {
+        Task<GenericResponseDto<AdminUserDto>> CreateAdminUserAsync(AdminCreateDto requestDto);
         Task<GenericResponseDto<AllMerchantListDto>> CreateMerchantAsync(MerchantCreateDto requestDto);
         Task<PagedResponse<AllMerchantListDto>> GetMerchantAsync(int page, int limit);
         Task<GenericResponseDto<AllMerchantListDto>> GetMerchantByIdAsync(long id);

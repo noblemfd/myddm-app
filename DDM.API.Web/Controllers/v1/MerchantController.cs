@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace DDM.API.Web.Controllers.v1
@@ -91,6 +92,14 @@ namespace DDM.API.Web.Controllers.v1
         [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
         public async Task<ActionResult<GenericResponseDto<MerchantProfileDto>>> GetMerchantProfile()
         {
+            var httpContext = new HttpContextAccessor();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
+            var username = httpContext.HttpContext.User.Identity.Name;
+          //  int.Parse(((ClaimsIdentity)HttpContext.User.Identity).ValueFromType("UserId"));
+            //var userId = Convert.ToInt64(HttpContext.User?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value);
+            //  var userId = long.Parse(httpContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            //  var userId = long.Parse(httpContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            //var response = await _merchantService.GetMerchantProfileAsync(userId);
             var response = await _merchantService.GetMerchantProfileAsync();
             Response.StatusCode = response.StatusCode ?? StatusCodes.Status200OK;
             return new JsonResult(response);

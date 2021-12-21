@@ -28,17 +28,17 @@ namespace DDM.API.Core.Services.v1.Concrete
         private readonly DDMDbContext _context;
         private readonly IMapper _mapper;
         private readonly UserResolverService _userResolverService;
-        //private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         //private readonly RoleManager<ApplicationRole> _roleManager;
 
         //  public MerchantService(IHttpContextAccessor httpContextAccessor, DDMDbContext context, IMapper mapper, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
-        public MerchantService(DDMDbContext context, IMapper mapper, UserResolverService userResolverService)
+        public MerchantService(DDMDbContext context, IMapper mapper, UserResolverService userResolverService, UserManager<ApplicationUser> userManager)
         {
           //  _httpContextAccessor = httpContextAccessor;
             _context = context;
             _mapper = mapper;
             _userResolverService = userResolverService;
-            //_userManager = userManager;
+            _userManager = userManager;
             //_roleManager = roleManager;
         }
         public async Task<GenericResponseDto<MandateListDto>> CreateMerchantMandateAsync(MandateCreateDto requestDto)
@@ -147,7 +147,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 response.Error = new ErrorResponseDto()
                 {
                     ErrorCode = 400,
-                    Message = "Merchant not found not found!"
+                    Message = "Merchant not found!"
                 };
                 response.StatusCode = 400;
             }
@@ -345,16 +345,16 @@ namespace DDM.API.Core.Services.v1.Concrete
                 response.Result = _mapper.Map<MerchantProfileDto>(merchantProfile);
                 response.StatusCode = 200;
             }
-            else
-            {
-                response.Error = new ErrorResponseDto()
-                {
-                    ErrorCode = 404,
-                    Message = "Merchant not found!"
-                };
-                response.StatusCode = 404;
+            //else
+            //{
+            //    response.Error = new ErrorResponseDto()
+            //    {
+            //        ErrorCode = 404,
+            //        Message = "Merchant not found!"
+            //    };
+            //    response.StatusCode = 404;
 
-            }
+            //}
 
             return response;
         }

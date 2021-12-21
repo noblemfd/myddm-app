@@ -22,6 +22,14 @@ namespace DDM.API.Web.Controllers.v1
             _adminService = adminService;
         }
 
+        [HttpPost("register/myadmin")]
+        public async Task<ActionResult<GenericResponseDto<AdminUserDto>>> Register(AdminCreateDto registrationRequest)
+        {
+            var response = await _adminService.CreateAdminUserAsync(registrationRequest);
+            Response.StatusCode = response.StatusCode ?? StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
         [HttpPost("merchant/add")]
         [Authorize(Roles = UserRoles.Admin)]  //[FromForm] 
         public async Task<ActionResult<GenericResponseDto<AllMerchantListDto>>> AddMerchant(MerchantCreateDto request)

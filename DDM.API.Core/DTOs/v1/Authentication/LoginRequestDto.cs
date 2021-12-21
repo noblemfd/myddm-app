@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -9,7 +10,9 @@ namespace DDM.API.Core.DTOs.v1.Authentication
 {
     public class LoginRequestDto
     {
-        [Required(ErrorMessage = "The Username is required!")]
+      //  [Required(ErrorMessage = "The Username is required!")]
+        [Required(ErrorMessage = "The User Name is required!")]
+        [JsonProperty(PropertyName = "UserName")] 
         public string UserName { get; set; }
 
         [Required(ErrorMessage = "The password is required!")]
