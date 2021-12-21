@@ -1,10 +1,12 @@
 ﻿using DDM.API.Core.DTOs.v1.Merchant.Request;
 using DDM.API.Core.DTOs.v1.Merchant.Response;
 using DDM.API.Core.Services.v1.Abstract;
+using DDM.API.Infrastructure.Data.Identiity;
 using DDM.API.Infrastructure.Entities.DTOs;
 using DDM.API.Infrastructure.Entities.Roles;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -17,8 +19,10 @@ namespace DDM.API.Web.Controllers.v1
     public class MerchantController : BaseApiController
     {
         private readonly IMerchantService _merchantService;
+        //private readonly UserManager<ApplicationUser> _userManager;
         public MerchantController(IMerchantService merchantService)
         {
+            //_userManager = userManager;
             _merchantService = merchantService;
         }
 
@@ -92,10 +96,13 @@ namespace DDM.API.Web.Controllers.v1
         [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
         public async Task<ActionResult<GenericResponseDto<MerchantProfileDto>>> GetMerchantProfile()
         {
-            var httpContext = new HttpContextAccessor();
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
-            var username = httpContext.HttpContext.User.Identity.Name;
-          //  int.Parse(((ClaimsIdentity)HttpContext.User.Identity).ValueFromType("UserId"));
+            //var httpContext = new HttpContextAccessor();
+            //var user = await _userManager.FindByIdAsync(HttpContext.User);
+            //var email = HttpContext.User?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+            //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
+            //var userId1 = User.FindFirst((ClaimTypes.NameIdentifier)).Value; // will give the user's userId
+            //var username = httpContext.HttpContext.User.Identity.Name;
+            //  int.Parse(((ClaimsIdentity)HttpContext.User.Identity).ValueFromType("UserId"));
             //var userId = Convert.ToInt64(HttpContext.User?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value);
             //  var userId = long.Parse(httpContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
             //  var userId = long.Parse(httpContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);

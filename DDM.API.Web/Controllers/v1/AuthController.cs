@@ -18,11 +18,11 @@ namespace DDM.API.Web.Controllers.v1
     public class AuthController : BaseApiController
     {
         private readonly IAuthService _authService;
-        private readonly DDMDbContext _context;
+        //private readonly DDMDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        public AuthController(DDMDbContext context, UserManager<ApplicationUser> userManager, IAuthService authService)
+        public AuthController(UserManager<ApplicationUser> userManager, IAuthService authService)
         {
-            _context = context;
+            //_context = context;
             _userManager = userManager;
             _authService = authService;
         }

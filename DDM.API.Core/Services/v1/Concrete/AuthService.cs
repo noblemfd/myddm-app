@@ -57,6 +57,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 var authClaims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, user.UserName),
+                  //  new Claim(ClaimTypes.NameIdentifier, user.Id),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
                 foreach (var userRole in roles)
@@ -113,7 +114,6 @@ namespace DDM.API.Core.Services.v1.Concrete
                 response.Error = new ErrorResponseDto() { ErrorCode = 401, Message = "You are not logged into the system!" };
                 response.StatusCode = 401;
             }
-
             return response;
         }
 

@@ -43,9 +43,9 @@ namespace DDM.API.Core.Services.v1.Concrete
         }
         public async Task<GenericResponseDto<MandateListDto>> CreateMerchantMandateAsync(MandateCreateDto requestDto)
         {
-          //  var userId = long.Parse(_userResolverService.GetUserId());
+            var userId = long.Parse(_userResolverService.GetUserId());
             var userId1 = _userResolverService.GetUserId();
-            var userId = long.Parse(userId1);
+            //var userId = long.Parse(userId1);
             var merchantId = _context.zib_merchants.Where(u => u.UserId == userId).Select(m => m.Id).FirstOrDefault();
                 //var existingMerchant = await _context.zib_merchants.FirstOrDefaultAsync(e => e.User.UserName == requestDto.UserName);
             //var response = new GenericResponseDto<AllMerchantListDto>();
@@ -333,8 +333,9 @@ namespace DDM.API.Core.Services.v1.Concrete
         public async Task<GenericResponseDto<MerchantProfileDto>> GetMerchantProfileAsync()
         {
             var response = new GenericResponseDto<MerchantProfileDto>();
-            var userId1 = _userResolverService.GetUserId();
-            var userId = long.Parse(userId1);
+            //var userId1 = _userResolverService.GetUserId();
+            //var userId = long.Parse(userId1);
+            var userId = long.Parse(_userResolverService.GetUserId());
             var merchantId = _context.zib_merchants.Where(u => u.UserId == userId).Select(m => m.Id).FirstOrDefault();
 
             var merchantProfile = await _context.zib_merchants.Include(e => e.User)
@@ -345,17 +346,16 @@ namespace DDM.API.Core.Services.v1.Concrete
                 response.Result = _mapper.Map<MerchantProfileDto>(merchantProfile);
                 response.StatusCode = 200;
             }
-            //else
-            //{
-            //    response.Error = new ErrorResponseDto()
-            //    {
-            //        ErrorCode = 404,
-            //        Message = "Merchant not found!"
-            //    };
-            //    response.StatusCode = 404;
+            else
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 404,
+                    Message = "Merchant not found!"
+                };
+                response.StatusCode = 404;
 
-            //}
-
+            }
             return response;
         }
         public async Task<GenericResponseDto<MerchantListDto>> GetMerchantByIdAsync(long id)
