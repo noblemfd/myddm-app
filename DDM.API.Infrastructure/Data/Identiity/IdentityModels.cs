@@ -15,6 +15,9 @@ namespace DDM.API.Infrastructure.Data.Identiity
         public string MobileNumber { get; set; }
 
         [JsonIgnore]
+        public bool? IsPasswordChanged { get; set; }
+
+        [JsonIgnore]
         public bool? IsDeleted { get; set; }
         public DateTime? LastLogin { get; set; }
         public ICollection<ApplicationUserRole> UserRoles { get; set; }

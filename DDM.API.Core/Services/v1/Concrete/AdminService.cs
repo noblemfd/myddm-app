@@ -25,15 +25,15 @@ namespace DDM.API.Core.Services.v1.Concrete
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
-      //  private readonly UserResolverService _userResolverService;
+        private readonly UserResolverService _userResolverService;
 
-        public AdminService(DDMDbContext context, IMapper mapper, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
+        public AdminService(DDMDbContext context, IMapper mapper, UserResolverService userResolverService, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
             _context = context;
             _mapper = mapper;
             _userManager = userManager;
             _roleManager = roleManager;
-          //  _userResolverService = userResolverService;
+            _userResolverService = userResolverService;
         }
         public async Task<GenericResponseDto<AdminUserDto>> CreateAdminUserAsync(AdminCreateDto requestDto)
         {
@@ -53,6 +53,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 else
                 {
                     response.StatusCode = 200;
+                    response.Message = "Successfully Created Admmin User";
                     response.Result = _mapper.Map<AdminUserDto>(user);
                 }
             }
@@ -68,6 +69,7 @@ namespace DDM.API.Core.Services.v1.Concrete
         {
             var existingMerchant = await _context.zib_merchants.FirstOrDefaultAsync(e => e.User.UserName == requestDto.UserName);
             var response = new GenericResponseDto<AllMerchantListDto>();
+            var userName = _userResolverService.GetUserName();
 
             if (existingMerchant != null)
             {
@@ -84,11 +86,9 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     MobileNumber = requestDto.MobileNumber,
                     UserName = requestDto.UserName,
-                   // PasswordHash = "@SecretPassword123",
                 };
 
-                  var result = await _userManager.CreateAsync(merchantUser, "@SecretPassword123");
-              //  var result = await _userManager.CreateAsync(merchantUser);
+                var result = await _userManager.CreateAsync(merchantUser, "@SecretPassword123");
 
                 if (result.Succeeded)
                 {
@@ -113,14 +113,15 @@ namespace DDM.API.Core.Services.v1.Concrete
 
                     try
                     {
-                       // var userName = _userResolverService.GetUserName();
+                        // var userName = _userResolverService.GetUserName();
                         merchant.UserId = merchantUser.Id;
-                        merchant.User = merchantUser;
-                      //  merchant.CreatedBy = userName;
+                        merchant.UserName = merchantUser.UserName;
+                        merchant.CreatedBy = userName;
                         _context.zib_merchants.Add(merchant);
                         await _context.SaveChangesAsync();
 
                         response.Result = _mapper.Map<AllMerchantListDto>(merchant);
+                        response.Message = "Successfully Created Merchant";
                         response.StatusCode = 201;
                     }
                     catch (Exception ex)
@@ -196,6 +197,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             if (merchant != null)
             {
                 response.Result = _mapper.Map<AllMerchantListDto>(merchant);
+                response.Message = "Successfully Retrieved Merchant";
                 response.StatusCode = 200;
             }
             else
@@ -305,6 +307,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             if (mandate != null)
             {
                 response.Result = _mapper.Map<AllMandateListDto>(mandate);
+                response.Message = "Successfully Retrieved Mandate";
                 response.StatusCode = 200;
             }
             else

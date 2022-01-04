@@ -14,6 +14,7 @@ namespace DDM.API.Core.DTOs.v1.Authentication
         public string Lastname { get; set; }
         public string Email { get; set; }
         public string UserName { get; set; }
+        public bool? IsPasswordChanged { get; set; }
         public string MobileNumber { get; set; }
         public DateTime LastLogin { get; set; }
 

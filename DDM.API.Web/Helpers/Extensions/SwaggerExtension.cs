@@ -1,6 +1,7 @@
 ﻿using DDM.API.Web.Helpers.Filters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.PlatformAbstractions;
@@ -55,7 +56,8 @@ namespace DDM.API.Web.Helpers.Extensions
         {
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
-
+          //  string virDir = Configuration.GetSection("VirtualDirectory").Value;
+            string virDir = app.ApplicationServices.GetRequiredService<IConfiguration>().GetSection("VirtualDirectory").Value;
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(
@@ -64,6 +66,7 @@ namespace DDM.API.Web.Helpers.Extensions
                     // build a swagger endpoint for each discovered API version
                     foreach (var description in provider.ApiVersionDescriptions)
                     {
+                     //   options.SwaggerEndpoint(virDir + "/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
                         options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
                     }
                 });

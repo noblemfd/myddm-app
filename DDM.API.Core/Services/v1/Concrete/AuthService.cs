@@ -15,6 +15,7 @@ using DDM.API.Infrastructure.Entities.DTOs;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
+using DDM.API.Core.Helpers;
 //using Microsoft.AspNetCore.Http;
 
 namespace DDM.API.Core.Services.v1.Concrete
@@ -26,14 +27,15 @@ namespace DDM.API.Core.Services.v1.Concrete
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
         private readonly DDMDbContext _context;
+        private readonly UserResolverService _userResolverService;
 
         public AuthService(
             UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
             IConfiguration configuration,
             IMapper mapper,
-            DDMDbContext context
-
+            DDMDbContext context,
+            UserResolverService userResolverService
         )
         {
             _userManager = userManager;
@@ -41,6 +43,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             _configuration = configuration;
             _mapper = mapper;
             _context = context;
+            _userResolverService = userResolverService;
         }
 
         public async Task<GenericResponseDto<object>> LoginUser(LoginRequestDto request)
@@ -77,11 +80,12 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(token),
                     user = _mapper.Map<UserDto>(user),
-                    role,
+                    roles,
                     //username,
                     expires = token.ValidTo
                 };
                 response.StatusCode = 200;
+                response.Message = "Successfully Logged In";
                 user.LastLogin = DateTime.Now;
                 try
                 {
@@ -99,6 +103,65 @@ namespace DDM.API.Core.Services.v1.Concrete
 
             return response;
         }
+        public async Task<GenericResponseDto<object>> PasswordChange(PasswordChangeDto request)
+        {
+            var userName = _userResolverService.GetUserName();
+            var user = await _userManager.FindByNameAsync(userName);
+            var response = new GenericResponseDto<object>();
+            if (user != null)
+            {
+                var result = await _userManager.ChangePasswordAsync(user, request.NewPassword, request.ConfirmNewPassword);
+                if (!result.Succeeded)
+                {
+                    var error = string.Join<IdentityError>(", ", result.Errors.ToArray());
+                    response.Error = new ErrorResponseDto { ErrorCode = 500, Message = "Failed to change password because of the following errors: " + error };
+                }
+                else
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Successfully Changed Password";
+                    response.Result = _mapper.Map<UserDto>(user);
+                }
+            }
+            else
+            {
+                response.Error = new ErrorResponseDto { ErrorCode = 400, Message = "This Username is not registered!" };
+                response.StatusCode = 400;
+            }
+            return response;
+        }
+        public async Task<GenericResponseDto<object>> MustChangePassword(MustChangePasswordDto request)
+        {
+            var userName = _userResolverService.GetUserName();
+            var user = await _userManager.FindByNameAsync(userName);
+            var response = new GenericResponseDto<object>();
+            if (user != null)
+            {
+                var result = await _userManager.ChangePasswordAsync(user, request.NewPassword, request.ConfirmNewPassword);
+                response.Result = new
+                {
+                    user = _mapper.Map<UserDto>(user)
+                };
+                response.StatusCode = 200;
+                response.Message = "Successfully Changed Password";
+                user.IsPasswordChanged = true;
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    response.Error = new ErrorResponseDto() { ErrorCode = 500, Message = ex.Message };
+                }
+                return response;
+            }
+            else
+            {
+                response.Error = new ErrorResponseDto { ErrorCode = 400, Message = "This Username is not registered!" };
+                response.StatusCode = 400;
+            }
+            return response;
+        }
 
         public async Task<GenericResponseDto<UserDto>> GetCurrentUserAsync(string username)
         {
@@ -107,6 +170,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             if (user != null)
             {
                 response.Result = _mapper.Map<UserDto>(user);
+                response.Message = "Successfully Retrieved Current User";
                 response.StatusCode = 200;
             }
             else

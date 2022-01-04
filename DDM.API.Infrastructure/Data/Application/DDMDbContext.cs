@@ -52,9 +52,9 @@ namespace DDM.API.Infrastructure.Data.Application
                 entity.Ignore(u => u.LockoutEnd);
                 entity.Ignore(u => u.EmailConfirmed);
                 entity.Ignore(u => u.TwoFactorEnabled);
-                entity.Ignore(u => u.LockoutEnd);
                 entity.Ignore(u => u.AccessFailedCount);
                 entity.Ignore(u => u.PhoneNumberConfirmed);
+                entity.Property(u => u.IsPasswordChanged).HasDefaultValue(false);
                 entity.Property(u => u.IsDeleted).HasDefaultValue(false);
             });
             builder.Entity<ApplicationRole>(entity =>

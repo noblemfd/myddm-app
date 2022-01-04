@@ -12,6 +12,7 @@ namespace DDM.API.Infrastructure.Entities.DTOs
         public int Page { get; set; }
         public int PerPage { get; set; }
         public long TotalPages { get; set; }
+      //  public string Message { get; set; }
         public ErrorResponseDto Error { get; set; }
     }
 }

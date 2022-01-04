@@ -8,11 +8,8 @@ using System.Threading.Tasks;
 
 namespace DDM.API.Core.DTOs.v1.Authentication
 {
-    public class PasswordChangeDto
+    public class MustChangePasswordDto
     {
-        //[Required]
-        //public string UserName { get; set; }
-
         [Required(ErrorMessage = "The Current Password is required!")]
         [DataType(DataType.Password)]
         [Display(Name = "Current Password")]

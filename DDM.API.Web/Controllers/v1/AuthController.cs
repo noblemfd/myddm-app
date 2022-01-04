@@ -37,6 +37,22 @@ namespace DDM.API.Web.Controllers.v1
             return new JsonResult(response);
         }
 
+        [HttpPut("change-password")]
+        public async Task<ActionResult<GenericResponseDto<object>>> ChangePassword(PasswordChangeDto passwordRequest)
+        {
+            var response = await _authService.PasswordChange(passwordRequest);
+            Response.StatusCode = response.StatusCode ?? StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpPut("must-change-password")]
+        public async Task<ActionResult<GenericResponseDto<object>>> MustChangePassword(MustChangePasswordDto passwordRequest)
+        {
+            var response = await _authService.MustChangePassword(passwordRequest);
+            Response.StatusCode = response.StatusCode ?? StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
         [HttpGet("current-profile")]
         [Authorize()]
         public async Task<ActionResult<GenericResponseDto<UserDto>>> CurrentProfile()

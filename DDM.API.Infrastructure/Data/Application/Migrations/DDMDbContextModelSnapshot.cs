@@ -71,6 +71,11 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
+                    b.Property<bool?>("IsPasswordChanged")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<DateTime?>("LastLogin")
                         .HasColumnType("datetime2");
 
@@ -473,6 +478,9 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
 
                     b.Property<long?>("UserId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<byte?>("WhoToCharge")
                         .ValueGeneratedOnAdd()

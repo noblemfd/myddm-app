@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DDM.API.Infrastructure.Data.Application.Migrations
 {
     [DbContext(typeof(DDMDbContext))]
-    [Migration("20211220183500_InitialDDM")]
+    [Migration("20211229115131_InitialDDM")]
     partial class InitialDDM
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -69,6 +69,11 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool?>("IsPasswordChanged")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
@@ -475,6 +480,9 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
 
                     b.Property<long?>("UserId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<byte?>("WhoToCharge")
                         .ValueGeneratedOnAdd()

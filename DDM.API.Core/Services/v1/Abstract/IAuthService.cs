@@ -11,6 +11,8 @@ namespace DDM.API.Core.Services.v1.Abstract
     public interface IAuthService
     {
         Task<GenericResponseDto<object>> LoginUser(LoginRequestDto request);
+        Task<GenericResponseDto<object>> PasswordChange(PasswordChangeDto request);
+        Task<GenericResponseDto<object>> MustChangePassword(MustChangePasswordDto request);
         //Task<GenericResponseDto<UserDto>> CreateUserAsync(RegistrationRequestDto requestDto);
         Task<GenericResponseDto<UserDto>> GetCurrentUserAsync(string UserName);
         //Task<GenericResponseDto<object>> PasswordChange(PasswordChangeDto request);

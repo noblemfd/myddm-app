@@ -43,10 +43,10 @@ namespace DDM.API.Core.Services.v1.Concrete
         }
         public async Task<GenericResponseDto<MandateListDto>> CreateMerchantMandateAsync(MandateCreateDto requestDto)
         {
-            var userId = long.Parse(_userResolverService.GetUserId());
-            var userId1 = _userResolverService.GetUserId();
+            var userId = _userResolverService.GetUserName();
+            var userId1 = _userResolverService.GetUserName();
             //var userId = long.Parse(userId1);
-            var merchantId = _context.zib_merchants.Where(u => u.UserId == userId).Select(m => m.Id).FirstOrDefault();
+            var merchantId = _context.zib_merchants.Where(u => u.UserName == userId).Select(m => m.Id).FirstOrDefault();
                 //var existingMerchant = await _context.zib_merchants.FirstOrDefaultAsync(e => e.User.UserName == requestDto.UserName);
             //var response = new GenericResponseDto<AllMerchantListDto>();
             var response = new GenericResponseDto<MandateListDto>();
@@ -80,6 +80,7 @@ namespace DDM.API.Core.Services.v1.Concrete
 
                     var transaction = new TransactionLog();
                     transaction.MandateId = mandate.Id;
+                    transaction.MerchantId = mandate.MerchantId;
                     transaction.RawData = mandate.RawData;
                     transaction.CreatedBy = userName;
                    // transaction.CreatedDate = DateTime.Now;
@@ -118,19 +119,20 @@ namespace DDM.API.Core.Services.v1.Concrete
                         var mandateDetail               = new MandateDetail();
                         mandateDetail.MandateId         = mandate.Id;
                         mandateDetail.MerchantId        = mandate.MerchantId;
-                        mandateDetail.SerialNumber      = i + 1;
+                        mandateDetail.SerialNumber      = (i + 1) - 1;
                         mandateDetail.ReferenceNumber   = mandate.ReferenceNumber;
                         mandateDetail.DrAccountNumber   = mandate.DrAccountNumber;
                         mandateDetail.StartDate         = mandate.StartDate;
                         mandateDetail.PayableAmount     = repaymentAmount;
                         mandateDetail.EndDate           = mandate.EndDate;
                         mandateDetail.DueDate           = dueDate;
-                        mandateDetail.CreatedBy = userName;
+                        mandateDetail.CreatedBy         = userName;
                         //  mandateDetail.CreatedDate       = DateTime.Now;
                         _context.zib_mandate_details.Add(mandateDetail);
                         await _context.SaveChangesAsync();
                     }
                     response.StatusCode = 201;
+                    response.Message = "Successfully Created Mandate and Schedules";
                     response.Result = _mapper.Map<MandateListDto>(mandate);
                 }
                 catch (Exception ex)
@@ -156,9 +158,8 @@ namespace DDM.API.Core.Services.v1.Concrete
         public async Task<PagedResponse<MandateListDto>> GetMandateAsync(int page, int limit)
         {
             var response = new PagedResponse<MandateListDto>();
-            var userId1 = _userResolverService.GetUserId();
-            var userId = long.Parse(userId1);
-            var merchantId = _context.zib_merchants.Where(u => u.UserId == userId).Select(m => m.Id).FirstOrDefault();
+            var userName = _userResolverService.GetUserName();
+            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
             try
             {
                 if (page >= 1 && limit >= 1)
@@ -195,9 +196,9 @@ namespace DDM.API.Core.Services.v1.Concrete
         public async Task<PagedResponse<MandateDetailListDto>> GetMandateDetailListAsync(long mandateId, int page, int limit)
         {
             var response = new PagedResponse<MandateDetailListDto>();
-            var userId1 = _userResolverService.GetUserId();
-            var userId = long.Parse(userId1);
-            var merchantId = _context.zib_merchants.Where(u => u.UserId == userId).Select(m => m.Id).FirstOrDefault();
+            var userName = _userResolverService.GetUserName();
+           // var userId = long.Parse(userId1);
+            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
             try
             {
                 if (page >= 1 && limit >= 1)
@@ -232,9 +233,8 @@ namespace DDM.API.Core.Services.v1.Concrete
         public async Task<PagedResponse<MandateWithDetailListDto>> GetMandateWithDetailListAsync(int page, int limit)
         {
             var response = new PagedResponse<MandateWithDetailListDto>();
-            var userId1 = _userResolverService.GetUserId();
-            var userId = long.Parse(userId1);
-            var merchantId = _context.zib_merchants.Where(u => u.UserId == userId).Select(m => m.Id).FirstOrDefault();
+            var userName = _userResolverService.GetUserName();
+            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
             try
             {
                 if (page >= 1 && limit >= 1)
@@ -271,9 +271,8 @@ namespace DDM.API.Core.Services.v1.Concrete
         public async Task<PagedResponse<MandateListDto>> GetMandateByCutomerAsync(string custAccountNo, int page, int limit)
         {
             var response = new PagedResponse<MandateListDto>();
-            var userId1 = _userResolverService.GetUserId();
-            var userId = long.Parse(userId1);
-            var merchantId = _context.zib_merchants.Where(u => u.UserId == userId).Select(m => m.Id).FirstOrDefault();
+            var userName = _userResolverService.GetUserName();
+            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
             try
             {
                 if (page >= 1 && limit >= 1)
@@ -335,8 +334,8 @@ namespace DDM.API.Core.Services.v1.Concrete
             var response = new GenericResponseDto<MerchantProfileDto>();
             //var userId1 = _userResolverService.GetUserId();
             //var userId = long.Parse(userId1);
-            var userId = long.Parse(_userResolverService.GetUserId());
-            var merchantId = _context.zib_merchants.Where(u => u.UserId == userId).Select(m => m.Id).FirstOrDefault();
+            var userName = _userResolverService.GetUserName();
+            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
 
             var merchantProfile = await _context.zib_merchants.Include(e => e.User)
                                                 .FirstOrDefaultAsync(e => e.Id == merchantId);
@@ -344,6 +343,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             if (merchantProfile != null)
             {
                 response.Result = _mapper.Map<MerchantProfileDto>(merchantProfile);
+                response.Message = "Successfully Retrieved Merchant Profile";
                 response.StatusCode = 200;
             }
             else
@@ -371,6 +371,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             if (merchant != null)
             {
                 response.Result = _mapper.Map<MerchantListDto>(merchant);
+                response.Message = "Successfully Retrieved Merchant";
                 response.StatusCode = 200;
             }
             else

@@ -8,13 +8,6 @@ namespace DDM.API.Infrastructure.Helpers
 {
     public class EnumList
     {
-        public enum Roles : byte
-        {
-            Admin = 1,
-            Merchant = 2,
-            Staff = 3,
-        }
-
         public enum MerchantStatus : byte
         {
             Inactive = 0,

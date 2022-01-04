@@ -26,6 +26,7 @@ namespace DDM.API.Infrastructure.Entities.Models
         public NotificationRequired? NotificationRequired { get; set; }
         public long? UserId { get; set; }
         public string NotificationUrl { get; set; }
+        public string UserName { get; set; }
         public string NotificationCredential { get; set; }  // False = 0, True = 1
         public ChargeRequired? ChargeRequired { get; set; }
         public ChargeMode? ChargeMode { get; set; }     // None = 0, Fixed = 1, Percentage = 2
