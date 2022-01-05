@@ -77,19 +77,15 @@ namespace DDM.API.Web
             app.UseVersionedSwagger(provider);
             #endregion
             #region CORS
+          //  app.UseCors("MyCorsImplementationPolicy");
+           // app.UseCors("AllowAll");
             app.UseCors("AllowAllOrigins");
+            //  app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             #endregion
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            //app.UseStaticFiles();
-            //app.UseEndpoints(endpoints =>
-            //{
-            //    endpoints.MapControllerRoute(
-            //       name: "default",
-            //       pattern: "{controller}/{action=Index}/{id?}");
-            //});
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

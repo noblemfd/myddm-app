@@ -64,7 +64,7 @@ namespace DDM.API.Web.Helpers.Extensions
             // CORS
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll", builder =>
+                options.AddPolicy("AllowAllOrigins", builder =>
                 {
                     builder.AllowAnyOrigin()
                         .AllowAnyHeader()
@@ -72,6 +72,14 @@ namespace DDM.API.Web.Helpers.Extensions
                 });
             }
             );
+            //services.AddCors(options =>
+            //{
+            //    options.AddPolicy("MyCorsImplementationPolicy", builder =>
+            //    {
+            //        builder.WithOrigins("*");
+            //    });
+            //}
+            //);
         }
     }
 }
