@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using DDM.API.Core.DTOs.v1.Admin.Response;
 using DDM.API.Core.DTOs.v1.Merchant.Request;
 using DDM.API.Core.DTOs.v1.Merchant.Response;
 using DDM.API.Infrastructure.Entities.Models;
@@ -14,17 +15,21 @@ namespace DDM.API.Core.ProfileMapping.v1
     {
         public MerchantMapperProfile()
         {
-            CreateMap<MandateCreateDto, Mandate>();
+            CreateMap<MandateCreateDto, Mandate>().ReverseMap();
 
             CreateMap<Merchant, MerchantProfileDto>()
                 .ForMember(e => e.UserName, options => options.MapFrom(e => e.User != null ? e.User.UserName : null))
-                .ForMember(e => e.MobileNumber, options => options.MapFrom(e => e.User != null ? e.User.MobileNumber : null));
+                .ForMember(e => e.MobileNumber, options => options.MapFrom(e => e.User != null ? e.User.MobileNumber : null)).ReverseMap();
 
             CreateMap<Mandate, MandateListDto>();
 
-            CreateMap<MandateDetail, MandateDetailListDto>();
+            CreateMap<MandateDetail, MandateDetailListDto>().ReverseMap();
 
-            CreateMap<Mandate, MandateWithDetailListDto>();
+            CreateMap<Mandate, MandateWithDetailListDto>().ReverseMap();
+
+            CreateMap<MandateDetail, MandateDetailListDto>().ReverseMap();
+
+            CreateMap<Merchant, MerchantListDto>().ReverseMap();
         }
     }
 }

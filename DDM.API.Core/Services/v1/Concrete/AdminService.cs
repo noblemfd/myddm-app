@@ -151,7 +151,6 @@ namespace DDM.API.Core.Services.v1.Concrete
         public async Task<PagedResponse<AllMerchantListDto>> GetMerchantAsync(int page, int limit)
         {
             var response = new PagedResponse<AllMerchantListDto>();
-
             try
             {
                 if (page >= 1 && limit >= 1)
@@ -232,11 +231,49 @@ namespace DDM.API.Core.Services.v1.Concrete
                 if (page >= 1 && limit >= 1)
                 {
                     var mandateQueryable = _context.zib_mandates.AsQueryable();
-                    var pagedMandates = await mandateQueryable.Include(l => l.Merchant)
+                    var pagedMandates = await mandateQueryable.Include(m => m.MandateDetails)
+                                                .ThenInclude(l => l.Merchant)
                                                 .ThenInclude(e => e.User)
                                                 .ToPagedListAsync(page, limit);
 
                     response.Result = _mapper.Map<List<AllMandateListDto>>(pagedMandates.ToList());
+                    response.TotalPages = pagedMandates.PageCount;
+                    response.Page = pagedMandates.PageNumber;
+                    response.PerPage = pagedMandates.PageSize;
+                }
+                else
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 400,
+                        Message = "The page number and page size must be greater than 1!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+            return response;
+        }
+        public async Task<PagedResponse<AllMandateWithDetailListDto>> GetMandateWithDetailListAsync(int page, int limit)
+        {
+            var response = new PagedResponse<AllMandateWithDetailListDto>();
+            try
+            {
+                if (page >= 1 && limit >= 1)
+                {
+                    var mandateQueryable = _context.zib_mandates.AsQueryable();
+                    var mandate = mandateQueryable.ToList();
+                    var pagedMandates = await mandateQueryable.Include(l => l.MandateDetails)
+                                                .ThenInclude(m => m.Merchant)
+                                                .ThenInclude(e => e.User)
+                                                .ToPagedListAsync(page, limit);
+                    response.Result = _mapper.Map<List<AllMandateWithDetailListDto>>(pagedMandates.ToList());
                     response.TotalPages = pagedMandates.PageCount;
                     response.Page = pagedMandates.PageNumber;
                     response.PerPage = pagedMandates.PageSize;
@@ -357,6 +394,17 @@ namespace DDM.API.Core.Services.v1.Concrete
                 };
             }
             return response;
+        }
+        public AdminDashboardDto GetAdminDashboard(string userName)
+        {
+            var totalMandateCount = 0;
+            var completedPaymentCount = 0;
+            var activeMerchantCount = 0;
+            var currentYearMandateCount = 0;
+
+            AdminDashboardDto data = new AdminDashboardDto();
+
+            return data;
         }
     }
 }

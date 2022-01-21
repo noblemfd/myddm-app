@@ -12,15 +12,15 @@ namespace DDM.API.Core.DTOs.v1.Authentication
     {
         //[Required]
         //public string UserName { get; set; }
-
         [Required(ErrorMessage = "The Current Password is required!")]
+        [StringLength(50, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Current Password")]
         [JsonProperty(PropertyName = "CurrentPassword")]
         public string CurrentPassword { get; set; }
 
         [Required(ErrorMessage = "The New Password is required!")]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 8)]
+        [StringLength(50, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "New Password")]
         [JsonProperty(PropertyName = "NewPassword")]

@@ -398,6 +398,8 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("MandateId");
+
                     b.HasIndex("MerchantId");
 
                     b.ToTable("zib_mandate_details");
@@ -807,7 +809,7 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                 {
                     b.HasOne("DDM.API.Infrastructure.Entities.Models.Mandate", "Mandate")
                         .WithMany("MandateDetails")
-                        .HasForeignKey("MerchantId");
+                        .HasForeignKey("MandateId");
 
                     b.HasOne("DDM.API.Infrastructure.Entities.Models.Merchant", "Merchant")
                         .WithMany("MandateDetails")

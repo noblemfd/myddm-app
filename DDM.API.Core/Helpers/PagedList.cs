@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DDM.API.Infrastructure.Entities.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace DDM.API.Core.Helpers
@@ -22,6 +23,7 @@ namespace DDM.API.Core.Helpers
         public int TotalPages { get; set; }
         public int PageSize { get; set; }
         public int TotalCount { get; set; }
+        public ErrorResponseDto Error { get; set; }
 
         public static async Task<PagedList<T>> CreateAsync(IQueryable<T> source, int pageNumber, int pageSize)
         {

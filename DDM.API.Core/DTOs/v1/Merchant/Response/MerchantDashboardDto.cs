@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace DDM.API.Core.DTOs.v1.Merchant.Response
 {
-    public class DashboardCountDto
+    public class MerchantDashboardDto
     {
-        public int AllMandateCount { get; set; }
-        public int CompletedPaymentCount { get; set; }
-        public int ActiveCustomerCount { get; set; }
+        public int? AllMandateCount { get; set; }
+        public int? CompletedPaymentCount { get; set; }
+        public int? ActiveCustomerCount { get; set; }
         public int? CurrentYearMandateCount { get; set; }
     }
 }

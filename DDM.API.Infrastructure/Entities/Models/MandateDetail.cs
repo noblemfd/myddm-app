@@ -39,7 +39,7 @@ namespace DDM.API.Infrastructure.Entities.Models
         [ForeignKey("MerchantId")]
         public virtual Merchant Merchant { get; set; }
 
-        [ForeignKey("MerchantId")]
+        [ForeignKey("MandateId")]
         public virtual Mandate Mandate { get; set; }
     }
 }

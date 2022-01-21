@@ -13,7 +13,7 @@ namespace DDM.API.Core.EntityMappe.v1
     {
         public AuthMapperProfile()
         {
-            CreateMap<ApplicationUser, UserDto>();
+            CreateMap<ApplicationUser, UserDto>().ReverseMap();
         }
     }
 }

@@ -96,17 +96,6 @@ namespace DDM.API.Web.Controllers.v1
         [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
         public async Task<ActionResult<GenericResponseDto<MerchantProfileDto>>> GetMerchantProfile()
         {
-            //var httpContext = new HttpContextAccessor();
-            //var user = await _userManager.FindByIdAsync(HttpContext.User);
-            //var email = HttpContext.User?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
-            //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
-            //var userId1 = User.FindFirst((ClaimTypes.NameIdentifier)).Value; // will give the user's userId
-            //var username = httpContext.HttpContext.User.Identity.Name;
-            //  int.Parse(((ClaimsIdentity)HttpContext.User.Identity).ValueFromType("UserId"));
-            //var userId = Convert.ToInt64(HttpContext.User?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value);
-            //  var userId = long.Parse(httpContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            //  var userId = long.Parse(httpContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            //var response = await _merchantService.GetMerchantProfileAsync(userId);
             var response = await _merchantService.GetMerchantProfileAsync();
             Response.StatusCode = response.StatusCode ?? StatusCodes.Status200OK;
             return new JsonResult(response);
@@ -118,6 +107,49 @@ namespace DDM.API.Web.Controllers.v1
         {
             var response = await _merchantService.GetMerchantByIdAsync(id);
             Response.StatusCode = response.StatusCode ?? StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("dashboard/data-count")]
+        [Authorize(Roles = UserRoles.Merchant)]
+        public List<DashboardCountDto> GetDashboardFieldCount()
+        {
+            return _merchantService.GetDashboardFieldCount();
+        }
+
+        [HttpGet("mandates/completed-payments")]
+        [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
+        public async Task<ActionResult<PagedResponse<MandateWithDetailListDto>>> GetCompletedPaymentList(int? page, int? limit)
+        {
+            var fullPage = page ?? 1;
+            var pageSize = limit ?? 10;
+
+            var response = await _merchantService.GetCompletedPaymentListAsync(fullPage, pageSize);
+            Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("mandates/this-year-mandate")]
+        [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
+        public async Task<ActionResult<PagedResponse<MandateListDto>>> GetThisYearMandate(int? page, int? limit)
+        {
+            var fullPage = page ?? 1;
+            var pageSize = limit ?? 10;
+
+            var response = await _merchantService.GetThisYearMandateAsync(fullPage, pageSize);
+            Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("mandates/latest-mandate")]
+        [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
+        public async Task<ActionResult<PagedResponse<MandateListDto>>> GetLatestMandate(int? page, int? limit)
+        {
+            var fullPage = page ?? 1;
+            var pageSize = limit ?? 10;
+
+            var response = await _merchantService.GetLatestMandateAsync(fullPage, pageSize);
+            Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
             return new JsonResult(response);
         }
     }

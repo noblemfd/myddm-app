@@ -32,6 +32,7 @@ namespace DDM.API.Infrastructure.Data.Application
         public DbSet<TokenLog> zib_logs { get; set; }
         public DbSet<RefreshToken> zib_refresh_tokens { get; set; }
         public DbSet<AuditTrail> zib_audit_trails { get; set; }
+     //   public DbSet<ApplicationUser> ApplicationUser { get; set; }
         public DbSet<ApplicationRole> ApplicationRole { get; set; }
         public DbSet<ApplicationUserRole> ApplicationUserRole { get; set; }
 
@@ -92,7 +93,7 @@ namespace DDM.API.Infrastructure.Data.Application
             builder.Entity<Mandate>(entity =>
             {
                 entity.Property(m => m.Id).ValueGeneratedOnAdd();
-                entity.HasIndex(m => new { m.MerchantId, m.ReferenceNumber }).IsUnique(true);
+                entity.HasIndex(m => new { m.MerchantId, m.ReferenceNumber }).IsUnique();
                 entity.Property(m => m.StartDate).HasColumnType("date");
                 entity.Property(m => m.EndDate).HasColumnType("date");
                 entity.Property(m => m.DueDate).HasColumnType("date");
@@ -100,6 +101,8 @@ namespace DDM.API.Infrastructure.Data.Application
                 entity.Property(m => m.IsDeleted).HasDefaultValue(false);
                 entity.Property(m => m.CreatedDate).HasColumnType("datetime");
                 entity.Property(m => m.LastUpdatedDate).HasColumnType("datetime");
+              //  entity.HasOne<TransactionLog>(s => s.TransactionLog)
+               // .WithOne(ad => ad.Mandate)
             });
             builder.Entity<MandateDetail>(entity =>
             {

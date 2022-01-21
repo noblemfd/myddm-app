@@ -23,7 +23,7 @@ namespace DDM.API.Core.DTOs.v1.Merchant.Response
         public string PostingReference { get; set; }
         public string ProcessedBy { get; set; }
         public DateTime ProcessedDate { get; set; }
-        public AllMerchantListDto Merchant { get; set; }
-      //  public AllMandateListDto Mandate { get; set; }
+        public MerchantListDto Merchant { get; set; }
+      //  public MandateListDto Mandate { get; set; }
     }
 }

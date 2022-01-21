@@ -110,7 +110,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             var response = new GenericResponseDto<object>();
             if (user != null)
             {
-                var result = await _userManager.ChangePasswordAsync(user, request.NewPassword, request.ConfirmNewPassword);
+                var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
                 if (!result.Succeeded)
                 {
                     var error = string.Join<IdentityError>(", ", result.Errors.ToArray());
@@ -137,14 +137,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             var response = new GenericResponseDto<object>();
             if (user != null)
             {
-                var result = await _userManager.ChangePasswordAsync(user, request.NewPassword, request.ConfirmNewPassword);
-                response.Result = new
-                {
-                    user = _mapper.Map<UserDto>(user)
-                };
-                response.StatusCode = 200;
-                response.Message = "Successfully Changed Password";
-                user.IsPasswordChanged = true;
+                var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
                 try
                 {
                     await _context.SaveChangesAsync();
@@ -153,7 +146,17 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto() { ErrorCode = 500, Message = ex.Message };
                 }
-                return response;
+                if (!result.Succeeded)
+                {
+                    var error = string.Join<IdentityError>(", ", result.Errors.ToArray());
+                    response.Error = new ErrorResponseDto { ErrorCode = 500, Message = "Failed to change password because of the following errors: " + error };
+                }
+                else
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Successfully Changed Password";
+                    response.Result = _mapper.Map<UserDto>(user);
+                }
             }
             else
             {
@@ -162,6 +165,41 @@ namespace DDM.API.Core.Services.v1.Concrete
             }
             return response;
         }
+        //public async Task<GenericResponseDto<object>> MustChangePassword(MustChangePasswordDto request)
+        //{
+        //    var userName = _userResolverService.GetUserName();
+        //    var user = await _userManager.FindByNameAsync(userName);
+        //    var response = new GenericResponseDto<object>();
+        //    if (user != null)
+        //    {
+        //        var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
+        //        response.Result = new
+        //        {
+        //            user = _mapper.Map<UserDto>(user)
+        //        };
+        //        if (result.Succeeded)
+        //        {
+        //            response.StatusCode = 200;
+        //            response.Message = "Successfully Changed Password";
+        //            user.IsPasswordChanged = true;
+        //        }
+        //        try
+        //        {
+        //            await _context.SaveChangesAsync();
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            response.Error = new ErrorResponseDto() { ErrorCode = 500, Message = ex.Message };
+        //        }
+        //        return response;
+        //    }
+        //    else
+        //    {
+        //        response.Error = new ErrorResponseDto { ErrorCode = 400, Message = "This Username is not registered!" };
+        //        response.StatusCode = 400;
+        //    }
+        //    return response;
+        //}
 
         public async Task<GenericResponseDto<UserDto>> GetCurrentUserAsync(string username)
         {

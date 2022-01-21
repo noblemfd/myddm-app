@@ -23,9 +23,11 @@ namespace DDM.API.Core.DTOs.v1.Admin.Response
         [DefaultValue(false)]
         public bool? IsApproved { get; set; }
         public decimal? Amount { get; set; }
-        public AllMerchantListDto Merchant { get; set; }
         public string RequestedBy { get; set; }
         public string ApprovedBy { get; set; }
         public DateTime? ApprovedDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public AllMerchantListDto Merchant { get; set; }
+        public ICollection<AllMandateDetailListDto> MandateDetails { get; set; }
     }
 }

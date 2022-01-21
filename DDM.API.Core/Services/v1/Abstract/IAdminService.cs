@@ -17,6 +17,7 @@ namespace DDM.API.Core.Services.v1.Abstract
         Task<GenericResponseDto<AllMerchantListDto>> CreateMerchantAsync(MerchantCreateDto requestDto);
         Task<PagedResponse<AllMerchantListDto>> GetMerchantAsync(int page, int limit);
         Task<GenericResponseDto<AllMerchantListDto>> GetMerchantByIdAsync(long id);
+        Task<PagedResponse<AllMandateWithDetailListDto>> GetMandateWithDetailListAsync(int page, int limit);
         //Task<GenericResponseDto<AllMerchantListDto>> UpdateMerchantAsync(long id, MerchantCreateDto requestDto);
         Task<GenericResponseDto<bool>> DeleteMerchantAsync(long id);
         Task<PagedResponse<AllMandateListDto>> GetAllMandateAsync(int page, int limit);
@@ -26,6 +27,6 @@ namespace DDM.API.Core.Services.v1.Abstract
         //Task<PagedResponse<AllMandateWithDetailListDto>> GetAllMandateWithDetailListAsync(long mandateId, int page, int limit);
         //Task<PagedResponse<AllStaffListDto>> GetAllStaffAsync(int page, int limit);
         //Task<PagedResponse<AllUserListDto>> GetAllUserAsync(int page, int limit);
-
+        AdminDashboardDto GetAdminDashboard(string userName);
     }
 }

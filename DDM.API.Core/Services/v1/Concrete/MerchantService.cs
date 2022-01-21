@@ -10,6 +10,7 @@ using DDM.API.Infrastructure.Entities.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,8 +58,9 @@ namespace DDM.API.Core.Services.v1.Concrete
                 try
                 {
                     var mandate = _mapper.Map<Mandate>(requestDto);
-                    string transactionJsonData = JsonSerializer.Serialize(mandate);
-                    switch((byte?)requestDto.PaymentFrequency)
+                   // string transactionJsonData = JsonSerializer.Serialize(mandate);
+                    string transactionJsonData = JsonConvert.SerializeObject(mandate);
+                    switch ((byte?)requestDto.PaymentFrequency)
                     {
                         case 1:
                             numberOfTimes = ConstantHelper.GetTotalMonth(mandate.StartDate, mandate.EndDate);
@@ -165,7 +167,8 @@ namespace DDM.API.Core.Services.v1.Concrete
                 if (page >= 1 && limit >= 1)
                 {
                     var mandateQueryable = _context.zib_mandates.AsQueryable().Where(m => m.MerchantId == merchantId);
-                    var pagedMandates = await mandateQueryable.Include(l => l.Merchant)
+                    var pagedMandates = await mandateQueryable.Include(l => l.MandateDetails)
+                                                .ThenInclude(l => l.Merchant)
                                                 .ThenInclude(e => e.User)
                                                 .ToPagedListAsync(page, limit);
 
@@ -234,16 +237,21 @@ namespace DDM.API.Core.Services.v1.Concrete
         {
             var response = new PagedResponse<MandateWithDetailListDto>();
             var userName = _userResolverService.GetUserName();
-            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => (int?)m.Id).FirstOrDefault();
             try
             {
                 if (page >= 1 && limit >= 1)
                 {
                     var mandateQueryable = _context.zib_mandates.AsQueryable().Where(m => m.MerchantId == merchantId);
-                    var pagedMandates = await mandateQueryable.Include(l => l.Merchant)
+                    var mandate = mandateQueryable.ToList();
+                    var pagedMandates = await mandateQueryable.Include(l => l.MandateDetails)
+                                                .ThenInclude(m => m.Merchant)
                                                 .ThenInclude(e => e.User)
                                                 .ToPagedListAsync(page, limit);
+                  //  var mandateList = pagedMandates.ToList();
+                  //  var stringRes = JsonConvert.SerializeObject(mandateList);
 
+                  //  response.Result = _mapper.Map<List<MandateWithDetailListDto>>(mandateList);
                     response.Result = _mapper.Map<List<MandateWithDetailListDto>>(pagedMandates.ToList());
                     response.TotalPages = pagedMandates.PageCount;
                     response.Page = pagedMandates.PageNumber;
@@ -361,9 +369,6 @@ namespace DDM.API.Core.Services.v1.Concrete
         public async Task<GenericResponseDto<MerchantListDto>> GetMerchantByIdAsync(long id)
         {
             var response = new GenericResponseDto<MerchantListDto>();
-            //var userId1 = _userResolverService.GetUserId();
-            //var userId = long.Parse(userId1);
-            //var merchantId = _context.zib_merchants.Where(u => u.UserId == userId).Select(m => m.Id).FirstOrDefault();
 
             var merchant = await _context.zib_merchants.Include(e => e.User)
                                                 .FirstOrDefaultAsync(e => e.Id == id);
@@ -386,32 +391,167 @@ namespace DDM.API.Core.Services.v1.Concrete
 
             return response;
         }
-        //public async Task<PagedResponse<MerchantProfileDto>> GetMerchantProfileAsync()
-        //{
-        //    var response = new PagedResponse<MerchantProfileDto>();
-        //    var userId1 = _userResolverService.GetUserId();
-        //    var userId = long.Parse(userId1);
-        //    var merchantId = _context.zib_merchants.Where(u => u.UserId == userId).Select(m => m.Id).FirstOrDefault();
-        //    var merchantProfile = await _context.zib_merchants.Include(e => e.User)
-        //                                        .FirstOrDefaultAsync(e => e.Id == merchantId);
+        public List<DashboardCountDto> GetDashboardFieldCount()
+        {
+            DashboardCountDto data = new DashboardCountDto();
+            DateTime current = DateTime.Now;
+            DateTime currentYear = DateTime.Parse($"{current.Year}/01/01");
 
+            var userName = _userResolverService.GetUserName();
+            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+
+            data.AllMandateCount = _context.zib_mandates.Where(m => m.MerchantId == merchantId).Select(c => c.Id).Distinct().Count();
+            data.CompletedPaymentCount = _context.zib_mandate_details.Where(m => m.MerchantId == merchantId).Where(m => (byte)m.MandateStatus == 2).Select(c => c.MandateId).Distinct().Count();
+            data.ActiveCustomerCount = _context.zib_mandates.Where(m => m.MerchantId == merchantId).Select(c => c.DrAccountNumber).Distinct().Count();
+            data.CurrentYearMandateCount = _context.zib_mandates.Where(m => m.CreatedDate >= currentYear).Where(m => m.MerchantId == merchantId).Select(c => c.Id).Distinct().Count();
+
+            List<DashboardCountDto> dataCount = new List<DashboardCountDto>();
+
+            dataCount.Add(data);
+
+            return dataCount;
+        }
+
+        public async Task<PagedResponse<MandateWithDetailListDto>> GetCompletedPaymentListAsync(int page, int limit)
+        {
+            var response = new PagedResponse<MandateWithDetailListDto>();
+            var userName = _userResolverService.GetUserName();
+            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => (int?)m.Id).FirstOrDefault();
+            try
+            {
+                if (page >= 1 && limit >= 1)
+                {
+                    var mandateQueryable = _context.zib_mandates.AsQueryable().Where(m => m.MerchantId == merchantId && !m.MandateDetails.Any(md => (byte)md.MandateStatus != 2));
+                    var mandate = mandateQueryable.ToList();
+                    var pagedMandates = await mandateQueryable.Include(l => l.MandateDetails)
+                                                .ThenInclude(m => m.Merchant)
+                                                .ThenInclude(e => e.User)
+                                                .ToPagedListAsync(page, limit);
+                    response.Result = _mapper.Map<List<MandateWithDetailListDto>>(pagedMandates.ToList());
+                    response.TotalPages = pagedMandates.PageCount;
+                    response.Page = pagedMandates.PageNumber;
+                    response.PerPage = pagedMandates.PageSize;
+                }
+                else
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 400,
+                        Message = "The page number and page size must be greater than 1!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+            return response;
+        }
+        public async Task<PagedResponse<MandateListDto>> GetThisYearMandateAsync(int page, int limit)
+        {
+            var response = new PagedResponse<MandateListDto>();
+            DateTime current = DateTime.Now;
+            DateTime currentYear = DateTime.Parse($"{current.Year}/01/01");
+            var userName = _userResolverService.GetUserName();
+            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            try
+            {
+                if (page >= 1 && limit >= 1)
+                {
+                    var mandateQueryable = _context.zib_mandates.AsQueryable().Where(m => m.CreatedDate >= currentYear).Where(m => m.MerchantId == merchantId);
+                    var pagedMandates = await mandateQueryable.Include(l => l.MandateDetails)
+                                                .ThenInclude(l => l.Merchant)
+                                                .ThenInclude(e => e.User)
+                                                .ToPagedListAsync(page, limit);
+
+                    response.Result = _mapper.Map<List<MandateListDto>>(pagedMandates.ToList());
+                    response.TotalPages = pagedMandates.PageCount;
+                    response.Page = pagedMandates.PageNumber;
+                    response.PerPage = pagedMandates.PageSize;
+                }
+                else
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 400,
+                        Message = "The page number and page size must be greater than 1!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+            return response;
+        }
+        public async Task<PagedResponse<MandateListDto>> GetLatestMandateAsync(int page, int limit)
+        {
+            var response = new PagedResponse<MandateListDto>();
+            var userName = _userResolverService.GetUserName();
+            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            try
+            {
+                if (page >= 1 && limit >= 1)
+                {
+                    var mandateQueryable = _context.zib_mandates.Take(3).AsQueryable().OrderByDescending(c => c.CreatedDate).Where(m => m.MerchantId == merchantId);
+                    var pagedMandates = await mandateQueryable.Include(l => l.MandateDetails)
+                                                .ThenInclude(l => l.Merchant)
+                                                .ThenInclude(e => e.User)
+                                                .ToPagedListAsync(page, limit);
+
+                    response.Result = _mapper.Map<List<MandateListDto>>(pagedMandates.ToList());
+                    response.TotalPages = pagedMandates.PageCount;
+                    response.Page = pagedMandates.PageNumber;
+                    response.PerPage = pagedMandates.PageSize;
+                }
+                else
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 400,
+                        Message = "The page number and page size must be greater than 1!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+            return response;
+        }
+        //public async Task<MandateListDto> GetMonthlyMandateAsync()
+        //{
+        //    var response = new PagedResponse<MandateListDto>();
+        //    DateTime current = DateTime.Now;
+        //    DateTime currentYear = DateTime.Parse($"{current.Year}/01/01");
+        //    var userName = _userResolverService.GetUserName();
+        //    var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
         //    try
         //    {
-        //        if (merchantProfile != null)
         //        {
+        //            var mandateQueryable = _context.zib_mandates.AsQueryable().Where(m => m.CreatedDate >= currentYear).Where(m => m.MerchantId == merchantId);
+        //            var pagedMandates = await mandateQueryable.Include(l => l.MandateDetails)
+        //                                        .ThenInclude(l => l.Merchant)
+        //                                        .ThenInclude(e => e.User)
+        //                                        .ToPagedListAsync(page, limit);
 
-        //            response.Result = _mapper.Map<MerchantProfileDto>(merchantProfile);
-        //            response.StatusCode = 200;
+        //            response.Result = _mapper.Map<List<MandateListDto>>(pagedMandates.ToList());
+        //            response.TotalPages = pagedMandates.PageCount;
+        //            response.Page = pagedMandates.PageNumber;
+        //            response.PerPage = pagedMandates.PageSize;
         //        }
-        //        else
-        //        {
-        //            response.Error = new ErrorResponseDto()
-        //            {
-        //                ErrorCode = 400,
-        //                Message = "Merchant Not Found!"
-        //            };
-        //        }
-
         //    }
         //    catch (Exception ex)
         //    {
@@ -421,7 +561,6 @@ namespace DDM.API.Core.Services.v1.Concrete
         //            Message = ex.Message
         //        };
         //    }
-
         //    return response;
         //}
     }

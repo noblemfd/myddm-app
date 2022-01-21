@@ -387,8 +387,8 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                 {
                     table.PrimaryKey("PK_zib_mandate_details", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_zib_mandate_details_zib_mandates_MerchantId",
-                        column: x => x.MerchantId,
+                        name: "FK_zib_mandate_details_zib_mandates_MandateId",
+                        column: x => x.MandateId,
                         principalTable: "zib_mandates",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -496,6 +496,11 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                 name: "IX_zib_logs_UserId",
                 table: "zib_logs",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_zib_mandate_details_MandateId",
+                table: "zib_mandate_details",
+                column: "MandateId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_zib_mandate_details_MerchantId",

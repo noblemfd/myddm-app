@@ -23,6 +23,7 @@ namespace DDM.API.Web.Controllers.v1
         }
 
         [HttpPost("register/myadmin")]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<ActionResult<GenericResponseDto<AdminUserDto>>> Register(AdminCreateDto registrationRequest)
         {
             var response = await _adminService.CreateAdminUserAsync(registrationRequest);
@@ -41,12 +42,24 @@ namespace DDM.API.Web.Controllers.v1
 
         [HttpGet("merchants")]
         [Authorize(Roles = UserRoles.Admin)]  //[FromForm] 
-        public async Task<ActionResult<PagedResponse<AllMerchantListDto>>> GetEAllMerchants(int? page, int? limit)
+        public async Task<ActionResult<PagedResponse<AllMerchantListDto>>> GetAllMerchants(int? page, int? limit)
         {
             var fullPage = page ?? 1;
             var pageSize = limit ?? 10;
 
             var response = await _adminService.GetMerchantAsync(fullPage, pageSize);
+            Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("mandates/mandate-with-details")]
+        [Authorize(Roles = UserRoles.Admin)]  //[FromForm] 
+        public async Task<ActionResult<PagedResponse<AllMandateWithDetailListDto>>> GetMandateWithDetails(int? page, int? limit)
+        {
+            var fullPage = page ?? 1;
+            var pageSize = limit ?? 10;
+
+            var response = await _adminService.GetMandateWithDetailListAsync(fullPage, pageSize);
             Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
             return new JsonResult(response);
         }

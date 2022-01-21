@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DDM.API.Infrastructure.Data.Application.Migrations
 {
     [DbContext(typeof(DDMDbContext))]
-    [Migration("20211229115131_InitialDDM")]
+    [Migration("20220117142648_InitialDDM")]
     partial class InitialDDM
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -399,6 +399,8 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                         .HasColumnType("date");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MandateId");
 
                     b.HasIndex("MerchantId");
 
@@ -809,7 +811,7 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                 {
                     b.HasOne("DDM.API.Infrastructure.Entities.Models.Mandate", "Mandate")
                         .WithMany("MandateDetails")
-                        .HasForeignKey("MerchantId");
+                        .HasForeignKey("MandateId");
 
                     b.HasOne("DDM.API.Infrastructure.Entities.Models.Merchant", "Merchant")
                         .WithMany("MandateDetails")

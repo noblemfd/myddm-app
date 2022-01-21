@@ -37,7 +37,7 @@ namespace DDM.API.Web.Controllers.v1
             return new JsonResult(response);
         }
 
-        [HttpPut("change-password")]
+        [HttpPost("change-password")]
         public async Task<ActionResult<GenericResponseDto<object>>> ChangePassword(PasswordChangeDto passwordRequest)
         {
             var response = await _authService.PasswordChange(passwordRequest);
@@ -45,7 +45,7 @@ namespace DDM.API.Web.Controllers.v1
             return new JsonResult(response);
         }
 
-        [HttpPut("must-change-password")]
+        [HttpPost("must-change-password")]
         public async Task<ActionResult<GenericResponseDto<object>>> MustChangePassword(MustChangePasswordDto passwordRequest)
         {
             var response = await _authService.MustChangePassword(passwordRequest);

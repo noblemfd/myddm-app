@@ -25,6 +25,8 @@ namespace DDM.API.Core.DTOs.v1.Merchant.Response
         public string RequestedBy { get; set; }
         public string ApprovedBy { get; set; }
         public DateTime? ApprovedDate { get; set; }
-        public AllMandateDetailListDto MandateDetail { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public MerchantListDto Merchant { get; set; }
+        public ICollection<MandateDetailListDto> MandateDetails { get; set; }
     }
 }

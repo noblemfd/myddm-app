@@ -54,7 +54,8 @@ namespace DDM.API.Infrastructure.Helpers
         {
             Monthly = 1,
             Quarterly = 2,
-            Yearly = 3
+            BiAnnual = 3,
+            Yearly = 4
         }
         public enum MandateStatus : byte
         {
