@@ -9,6 +9,7 @@ namespace DDM.API.Core.DTOs.v1.Admin.Response
 {
     public class AllMandateDetailListDto
     {
+        public long? Id { get; set; }
         public long? MerchantId { get; set; }
         public long? MandateId { get; set; }
         public string ReferenceNumber { get; set; }

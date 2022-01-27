@@ -13,22 +13,22 @@ namespace DDM.API.Core.DTOs.v1.Admin.Request
     {
         [Required(ErrorMessage = "Merchant Name is required")]
         [JsonProperty(PropertyName = "MerchantName")]
-        [StringLength(100)]
+      //  [StringLength(100)]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 3)]
         public string MerchantName { get; set; }
 
         [Required(ErrorMessage = "Account Number is required")]
         [JsonProperty(PropertyName = "AccountNumber")]
-        [StringLength(50)]
+        [StringLength(50, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 5)]
         public string AccountNumber { get; set; }
 
-        [StringLength(50)]
+        [StringLength(50, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 5)]
         [Required(ErrorMessage = "User Name is required")]
         [JsonProperty(PropertyName = "UserName")]
-        // [RegularExpression(@"^\S*$", ErrorMessage = "Username Cannot Have Spaces")]  // Accepts Comma
-        [RegularExpression(@"^[^\s\,]+$", ErrorMessage = "Username Cannot Have Spaces")]  // Retrict comma
+        [RegularExpression(@"^[^\s\,]+$", ErrorMessage = "Username Cannot Have Spaces")]  
         public string UserName { get; set; }
 
-        [StringLength(50)]
+        [StringLength(15)]
         [JsonProperty(PropertyName = "MobileNumber")]
         public string MobileNumber { get; set; }
 

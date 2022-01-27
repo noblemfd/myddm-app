@@ -9,6 +9,7 @@ namespace DDM.API.Core.DTOs.v1.Merchant.Response
 {
     public class MerchantListDto
     {
+        public long? Id { get; set; }
         public string MerchantName { get; set; }
         public string AccountNumber { get; set; }
         public string UserName { get; set; }

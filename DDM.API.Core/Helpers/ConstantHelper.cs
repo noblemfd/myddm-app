@@ -26,6 +26,17 @@ namespace DDM.API.Core.Helpers
             return (date.Year * 4) + ((date.Month - 1) / 3);
         }
 
+        public static int GetTotalBiAnnual(DateTime startDate, DateTime endDate)
+        {
+            int first = GetBiannual(startDate);
+            int second = GetBiannual(endDate);
+            return 1 + Math.Abs(first - second);
+        }
+        private static int GetBiannual(DateTime date)
+        {
+            return (date.Year * 2) + ((date.Month - 1) / 6);
+        }
+
         public static int GetTotalYear(DateTime startDate, DateTime endDate)
         {
             int years = endDate.Year - startDate.Year;

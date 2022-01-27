@@ -98,6 +98,7 @@ namespace DDM.API.Infrastructure.Data.Application
                 entity.Property(m => m.EndDate).HasColumnType("date");
                 entity.Property(m => m.DueDate).HasColumnType("date");
                 entity.Property(m => m.IsApproved).HasDefaultValue(false);
+                entity.Property(m => m.IsCancelled).HasDefaultValue(false);
                 entity.Property(m => m.IsDeleted).HasDefaultValue(false);
                 entity.Property(m => m.CreatedDate).HasColumnType("datetime");
                 entity.Property(m => m.LastUpdatedDate).HasColumnType("datetime");

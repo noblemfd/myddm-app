@@ -10,6 +10,7 @@ namespace DDM.API.Core.DTOs.v1.Merchant.Response
 {
     public class MandateDetailListDto
     {
+        public long? Id { get; set; }
         public long? MerchantId { get; set; }
         public long? MandateId { get; set; }
         public string ReferenceNumber { get; set; }

@@ -138,14 +138,6 @@ namespace DDM.API.Core.Services.v1.Concrete
             if (user != null)
             {
                 var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
-                try
-                {
-                    await _context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    response.Error = new ErrorResponseDto() { ErrorCode = 500, Message = ex.Message };
-                }
                 if (!result.Succeeded)
                 {
                     var error = string.Join<IdentityError>(", ", result.Errors.ToArray());
@@ -155,7 +147,16 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.StatusCode = 200;
                     response.Message = "Successfully Changed Password";
+                    user.IsPasswordChanged = true;
                     response.Result = _mapper.Map<UserDto>(user);
+                }
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    response.Error = new ErrorResponseDto() { ErrorCode = 500, Message = ex.Message };
                 }
             }
             else

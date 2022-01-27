@@ -337,7 +337,8 @@ namespace DDM.API.Core.Services.v1.Concrete
         {
             var response = new GenericResponseDto<AllMandateListDto>();
 
-            var mandate = await _context.zib_mandates.Include(l => l.Merchant)
+            var mandate = await _context.zib_mandates.Include(l => l.MandateDetails)
+                                                .ThenInclude(l => l.Merchant)
                                                 .ThenInclude(e => e.User)
                                                 .FirstOrDefaultAsync(e => e.Id == id);
 
@@ -395,16 +396,192 @@ namespace DDM.API.Core.Services.v1.Concrete
             }
             return response;
         }
-        public AdminDashboardDto GetAdminDashboard(string userName)
+        //public AdminDashboardDto GetAdminDashboard(string userName)
+        //{
+        //    var totalMandateCount = 0;
+        //    var completedPaymentCount = 0;
+        //    var activeMerchantCount = 0;
+        //    var currentYearMandateCount = 0;
+
+        //    AdminDashboardDto data = new AdminDashboardDto();
+
+        //    return data;
+        //}
+        public List<AdminDashboardCountDto> GetDashboardFieldCount()
         {
-            var totalMandateCount = 0;
-            var completedPaymentCount = 0;
-            var activeMerchantCount = 0;
-            var currentYearMandateCount = 0;
+            AdminDashboardCountDto data = new AdminDashboardCountDto();
+            DateTime current = DateTime.Now;
+            DateTime currentYear = DateTime.Parse($"{current.Year}/01/01");
 
-            AdminDashboardDto data = new AdminDashboardDto();
+            data.AllMandateCount = _context.zib_mandates.Select(c => c.Id).Distinct().Count();
+            data.CompletedPaymentCount = _context.zib_mandate_details.Where(m => (byte)m.MandateStatus == 2).Select(c => c.MandateId).Distinct().Count();
+            data.ActiveMerchantCount = _context.zib_merchants.Select(c => c.MerchantName).Distinct().Count();
+            data.CurrentYearMandateCount = _context.zib_mandates.Where(m => m.CreatedDate >= currentYear).Select(c => c.Id).Distinct().Count();
 
-            return data;
+            List<AdminDashboardCountDto> dataCount = new List<AdminDashboardCountDto>();
+
+            dataCount.Add(data);
+
+            return dataCount;
+        }
+
+        public async Task<PagedResponse<AllMandateWithDetailListDto>> GetCompletedPaymentListAsync(int page, int limit)
+        {
+            var response = new PagedResponse<AllMandateWithDetailListDto>();
+            try
+            {
+                if (page >= 1 && limit >= 1)
+                {
+                    var mandateQueryable = _context.zib_mandates.AsQueryable().Where(m => !m.MandateDetails.Any(md => (byte)md.MandateStatus != 2));
+                    var mandate = mandateQueryable.ToList();
+                    var pagedMandates = await mandateQueryable.Include(l => l.MandateDetails)
+                                                .ThenInclude(m => m.Merchant)
+                                                .ThenInclude(e => e.User)
+                                                .ToPagedListAsync(page, limit);
+                    response.Result = _mapper.Map<List<AllMandateWithDetailListDto>>(pagedMandates.ToList());
+                    response.TotalPages = pagedMandates.PageCount;
+                    response.Page = pagedMandates.PageNumber;
+                    response.PerPage = pagedMandates.PageSize;
+                }
+                else
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 400,
+                        Message = "The page number and page size must be greater than 1!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+            return response;
+        }
+        public async Task<PagedResponse<AllMandateListDto>> GetThisYearMandateAsync(int page, int limit)
+        {
+            var response = new PagedResponse<AllMandateListDto>();
+            DateTime current = DateTime.Now;
+            DateTime currentYear = DateTime.Parse($"{current.Year}/01/01");
+            try
+            {
+                if (page >= 1 && limit >= 1)
+                {
+                    var mandateQueryable = _context.zib_mandates.AsQueryable().Where(m => m.CreatedDate >= currentYear);
+                    var pagedMandates = await mandateQueryable.Include(l => l.MandateDetails)
+                                                .ThenInclude(l => l.Merchant)
+                                                .ThenInclude(e => e.User)
+                                                .ToPagedListAsync(page, limit);
+
+                    response.Result = _mapper.Map<List<AllMandateListDto>>(pagedMandates.ToList());
+                    response.TotalPages = pagedMandates.PageCount;
+                    response.Page = pagedMandates.PageNumber;
+                    response.PerPage = pagedMandates.PageSize;
+                }
+                else
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 400,
+                        Message = "The page number and page size must be greater than 1!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+            return response;
+        }
+        public async Task<PagedResponse<AllMandateListDto>> GetLatestMandateAsync(int page, int limit)
+        {
+            var response = new PagedResponse<AllMandateListDto>();
+            try
+            {
+                if (page >= 1 && limit >= 1)
+                {
+                    var mandateQueryable = _context.zib_mandates.Take(5).AsQueryable().OrderByDescending(c => c.CreatedDate);
+                    var pagedMandates = await mandateQueryable.Include(l => l.MandateDetails)
+                                                .ThenInclude(l => l.Merchant)
+                                                .ThenInclude(e => e.User)
+                                                .ToPagedListAsync(page, limit);
+
+                    response.Result = _mapper.Map<List<AllMandateListDto>>(pagedMandates.ToList());
+                    response.TotalPages = pagedMandates.PageCount;
+                    response.Page = pagedMandates.PageNumber;
+                    response.PerPage = pagedMandates.PageSize;
+                }
+                else
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 400,
+                        Message = "The page number and page size must be greater than 1!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+            return response;
+        }
+        public List<AdminMonthlySumDto> GetMandateMonthlySum()
+        {
+            DateTime current = DateTime.Now;
+            DateTime currentYear = DateTime.Parse($"{current.Year}/01/01");
+
+            var monthlyMandate = _context.zib_mandates.Where(m => m.CreatedDate >= currentYear)
+                .GroupBy(o => new
+                {
+                    Month = o.CreatedDate.Value.Month
+                })
+                .Select(u => new AdminMonthlySumDto
+                {
+                    ItemSum = u.Sum(x => x.Amount),
+                    Month = u.Key.Month,
+                    MonthName = u.Key.Month.ToString("MMMM")
+                    //MonthName = u.Select(m => m.CreatedDate.Value.ToString("MMMM")).FirstOrDefault()
+                    //  MonthName = DateTime.ParseExact(MonthNameValue, "MMMM", CultureInfo.CurrentCulture).Month
+                })
+                .ToList();
+            // monthlyMandate.ForEach(var userdata in monthlyMandate)
+          //  DateTime dt = DateTime.Now;
+          //  Console.WriteLine(dt.ToString("MMMM"));
+         // .Select(m => m.Id).FirstOrDefault();
+            return monthlyMandate;
+        }
+
+        public List<AdminYearlySumDto> GetFiveYearMandate()
+        {
+            var yearlyMandate = _context.zib_mandates.Where(m => m.CreatedDate > DateTime.Now.AddYears(-5))
+                .GroupBy(o => o.CreatedDate.Value.Year)
+                .Select(u => new AdminYearlySumDto
+                {
+                    ItemTotal = u.Sum(x => x.Amount),
+                    Year = u.Key 
+        }
+                ).ToList();
+
+            //grand total
+            var tot = yearlyMandate.Sum(s => s.ItemTotal);
+
+            //apply percentage to each element
+            yearlyMandate.ForEach(s => s.ItemPercent = (int)((decimal)100.0 * s.ItemTotal / tot));
+
+            return yearlyMandate;
         }
     }
 }

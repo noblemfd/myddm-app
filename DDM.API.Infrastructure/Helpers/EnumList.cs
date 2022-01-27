@@ -15,7 +15,6 @@ namespace DDM.API.Infrastructure.Helpers
         }
         public enum ChargeMode : byte
         {
-            None = 0,
             Fixed = 1,
             Percentage = 2
         }
@@ -48,7 +47,8 @@ namespace DDM.API.Infrastructure.Helpers
         {
             None = 0,
             Merchant = 1,
-            Customer = 2
+            Customer = 2,
+            Both = 3
         }
         public enum PaymentFrequency : byte
         {

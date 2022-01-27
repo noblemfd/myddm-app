@@ -261,6 +261,9 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                     b.Property<DateTime?>("ApprovedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("CancellationNote")
+                        .HasColumnType("varchar(500)");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -281,6 +284,11 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
+                    b.Property<bool?>("IsCancelled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<bool?>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -291,6 +299,9 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
 
                     b.Property<DateTime?>("LastUpdatedDate")
                         .HasColumnType("datetime");
+
+                    b.Property<DateTime?>("MandateCancellationDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<long>("MerchantId")
                         .HasColumnType("bigint");

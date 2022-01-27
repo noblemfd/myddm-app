@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using DDM.API.Core.Helpers;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -14,13 +15,13 @@ namespace DDM.API.Core.DTOs.v1.Merchant.Request
     {
         public long MerchantId { get; set; }
 
-        [StringLength(200, MinimumLength = 1)]
+        [StringLength(50, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 3)]
         [Display(Name = "Reference Number")]
         [Required(ErrorMessage = "Reference Number is Required")]
         [JsonProperty(PropertyName = "ReferenceNumber")]
         public string ReferenceNumber { get; set; }
 
-        [StringLength(50, MinimumLength = 1)]
+        [StringLength(50, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 3)]
         [Display(Name = "Debit Account Noumber")]
         [Required(ErrorMessage = "Debit Account No. is Required")]
         [JsonProperty(PropertyName = "DrAccountNumber")]
@@ -36,16 +37,15 @@ namespace DDM.API.Core.DTOs.v1.Merchant.Request
         [DataType(DataType.Date)]
         [Display(Name = "End Date")]
         [Required(ErrorMessage = "End Date is Required")]
+        [DateGreaterThanAttribute(otherPropertyName = "StartDate", ErrorMessage = "End Date must be greater than Start Date")]
         [JsonProperty(PropertyName = "EndDate")]
         public DateTime EndDate { get; set; }
-       // public string RawData { get; set; }
 
-        [Range(1,3)]
+        [Range(1,4)]
         [Display(Name = "Payment Frequency")]
         [Required(ErrorMessage = "Payment Frequency is Required")]
         [JsonProperty(PropertyName = "PaymentFrequency")]
-        public PaymentFrequency? PaymentFrequency { get; set; }      //1=Monthly, 2=Quarterly, 3=Yearly      
-        //   public int? PaymentCount { get; set; }      //4, or 3 based on PaymentFrequency
+        public PaymentFrequency? PaymentFrequency { get; set; }      //1=Monthly, 2=Quarterly, 3=BiAnnual, 4=Yearly      
 
         [Display(Name = "Amount")]
         [DataType(DataType.Currency)]
@@ -53,9 +53,5 @@ namespace DDM.API.Core.DTOs.v1.Merchant.Request
         [Column(TypeName = "decimal(18,2)")]
         [JsonProperty(PropertyName = "Amount")]
         public decimal Amount { get; set; }
-
-        //public string RequestedBy { get; set; }
-        //public string ApprovedBy { get; set; }
-      //  public DateTime? ApprovedDate { get; set; }
     }
 }

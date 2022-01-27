@@ -69,6 +69,9 @@ namespace DDM.API.Core.Services.v1.Concrete
                             numberOfTimes = ConstantHelper.GetTotalQuarter(mandate.StartDate, mandate.EndDate);
                             break;
                         case 3:
+                            numberOfTimes = ConstantHelper.GetTotalBiAnnual(mandate.StartDate, mandate.EndDate);
+                            break;
+                        case 4:
                             numberOfTimes = ConstantHelper.GetTotalYear(mandate.StartDate, mandate.EndDate);
                             break;
                     }
@@ -110,13 +113,20 @@ namespace DDM.API.Core.Services.v1.Concrete
                                 dueDate = dueDate.AddMonths(3);
                             }
                             break;
-                            case Infrastructure.Helpers.EnumList.PaymentFrequency.Yearly:
+                            case Infrastructure.Helpers.EnumList.PaymentFrequency.BiAnnual:
                             if (i != 1)
                             {
                                 // Reset Date
-                                dueDate = dueDate.AddYears(1);
+                                dueDate = dueDate.AddMonths(6);
                             }
                             break;
+                            case Infrastructure.Helpers.EnumList.PaymentFrequency.Yearly:
+                                if (i != 1)
+                                {
+                                    // Reset Date
+                                    dueDate = dueDate.AddYears(1);
+                                }
+                                break;
                         }
                         var mandateDetail               = new MandateDetail();
                         mandateDetail.MandateId         = mandate.Id;
@@ -316,10 +326,10 @@ namespace DDM.API.Core.Services.v1.Concrete
         {
             var response = new GenericResponseDto<MandateListDto>();
 
-            var mandate = await _context.zib_mandates.Include(l => l.Merchant)
+            var mandate = await _context.zib_mandates.Include(l => l.MandateDetails)
+                                                .ThenInclude(l => l.Merchant)
                                                 .ThenInclude(e => e.User)
                                                 .FirstOrDefaultAsync(e => e.Id == id);
-
             if (mandate != null)
             {
                 response.Result = _mapper.Map<MandateListDto>(mandate);
@@ -391,9 +401,9 @@ namespace DDM.API.Core.Services.v1.Concrete
 
             return response;
         }
-        public List<DashboardCountDto> GetDashboardFieldCount()
+        public List<MerchantDashboardCountDto> GetDashboardFieldCount()
         {
-            DashboardCountDto data = new DashboardCountDto();
+            MerchantDashboardCountDto data = new MerchantDashboardCountDto();
             DateTime current = DateTime.Now;
             DateTime currentYear = DateTime.Parse($"{current.Year}/01/01");
 
@@ -405,7 +415,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             data.ActiveCustomerCount = _context.zib_mandates.Where(m => m.MerchantId == merchantId).Select(c => c.DrAccountNumber).Distinct().Count();
             data.CurrentYearMandateCount = _context.zib_mandates.Where(m => m.CreatedDate >= currentYear).Where(m => m.MerchantId == merchantId).Select(c => c.Id).Distinct().Count();
 
-            List<DashboardCountDto> dataCount = new List<DashboardCountDto>();
+            List<MerchantDashboardCountDto> dataCount = new List<MerchantDashboardCountDto>();
 
             dataCount.Add(data);
 

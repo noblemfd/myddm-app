@@ -32,7 +32,7 @@ namespace DDM.API.Infrastructure.Entities.Models
 
         [Display(Name = "Amount")]
         [DataType(DataType.Currency)]
-        public decimal? Amount { get; set; }
+        public decimal Amount { get; set; }
 
         [Column(TypeName = "varchar(200)")]
         public string RequestedBy { get; set; }
@@ -40,6 +40,13 @@ namespace DDM.API.Infrastructure.Entities.Models
         [Column(TypeName = "varchar(200)")]
         public string ApprovedBy { get; set; }
         public DateTime? ApprovedDate { get; set; }
+
+        [DefaultValue(false)]
+        public bool? IsCancelled { get; set; }
+
+        [Column(TypeName = "varchar(500)")]
+        public string CancellationNote { get; set; }
+        public DateTime? MandateCancellationDate { get; set; }
 
         [ForeignKey("MerchantId")]
         public virtual Merchant Merchant { get; set; }

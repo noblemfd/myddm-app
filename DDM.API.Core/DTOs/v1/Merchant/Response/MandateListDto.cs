@@ -10,7 +10,8 @@ namespace DDM.API.Core.DTOs.v1.Merchant.Response
 {
     public class MandateListDto
     {
-      //  public long MerchantId { get; set; }
+        public long? Id { get; set; }
+        //  public long MerchantId { get; set; }
         public string ReferenceNumber { get; set; }
         public string DrAccountNumber { get; set; }
         public DateTime StartDate { get; set; }
@@ -25,6 +26,11 @@ namespace DDM.API.Core.DTOs.v1.Merchant.Response
         public string RequestedBy { get; set; }
         public string ApprovedBy { get; set; }
         public DateTime? ApprovedDate { get; set; }
+
+        [DefaultValue(false)]
+        public bool? IsCancelled { get; set; }
+        public string CancellationNote { get; set; }
+        public DateTime? MandateCancellationDate { get; set; }
         public DateTime? CreatedDate { get; set; }
         public MerchantListDto Merchant { get; set; }
         public ICollection<MandateDetailListDto> MandateDetails { get; set; }

@@ -1,7 +1,7 @@
 ﻿using DDM.API.Core.DTOs.v1.Admin.Request;
 using DDM.API.Core.DTOs.v1.Admin.Response;
 using DDM.API.Core.DTOs.v1.Merchant.Request;
-using DDM.API.Core.DTOs.v1.Merchant.Response;
+//using DDM.API.Core.DTOs.v1.Merchant.Response;
 using DDM.API.Infrastructure.Entities.DTOs;
 using System;
 using System.Collections.Generic;
@@ -27,6 +27,12 @@ namespace DDM.API.Core.Services.v1.Abstract
         //Task<PagedResponse<AllMandateWithDetailListDto>> GetAllMandateWithDetailListAsync(long mandateId, int page, int limit);
         //Task<PagedResponse<AllStaffListDto>> GetAllStaffAsync(int page, int limit);
         //Task<PagedResponse<AllUserListDto>> GetAllUserAsync(int page, int limit);
-        AdminDashboardDto GetAdminDashboard(string userName);
+        //AdminDashboardDto GetAdminDashboard(string userName);
+        List<AdminDashboardCountDto> GetDashboardFieldCount();
+        Task<PagedResponse<AllMandateWithDetailListDto>> GetCompletedPaymentListAsync(int page, int limit);
+        Task<PagedResponse<AllMandateListDto>> GetThisYearMandateAsync(int page, int limit);
+        Task<PagedResponse<AllMandateListDto>> GetLatestMandateAsync(int page, int limit);
+        List<AdminMonthlySumDto> GetMandateMonthlySum();
+        List<AdminYearlySumDto> GetFiveYearMandate();
     }
 }

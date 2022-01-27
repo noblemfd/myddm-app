@@ -9,6 +9,7 @@ namespace DDM.API.Core.DTOs.v1.Admin.Response
 {
     public class AllMerchantListDto
     {
+        public long? Id { get; set; }
         public string MerchantName { get; set; }
         public string AccountNumber { get; set; }
         public string UserName { get; set; }
@@ -25,6 +26,7 @@ namespace DDM.API.Core.DTOs.v1.Admin.Response
         public decimal? ChargeValue { get; set; }
         public decimal? MinChargeValue { get; set; }
         public decimal? MaxChargeValue { get; set; }
-      //  public ICollection<AllMandateListDto> Mandates { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public AllUserListDto User { get; set; }
     }
 }

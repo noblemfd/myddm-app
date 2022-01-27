@@ -33,6 +33,8 @@ namespace DDM.API.Core.EntityMapper.v1
             CreateMap<MandateDetail, AllMandateDetailListDto>().ReverseMap();
 
             CreateMap<Merchant, AllMerchantListDto>().ReverseMap();
+
+            CreateMap<ApplicationUser, AllUserListDto>().ReverseMap();
         }
     }
 }

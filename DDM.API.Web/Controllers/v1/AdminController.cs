@@ -86,7 +86,7 @@ namespace DDM.API.Web.Controllers.v1
         }
 
         //[HttpGet, Route("Mandates/{merchantId}")]
-        [HttpGet("mandates/{merchantId}")]
+        [HttpGet("mandates/mandates-by-merchant/{merchantId}")]
         [Authorize(Roles = UserRoles.Admin)]  //[FromForm] 
         public async Task<ActionResult<PagedResponse<AllMandateListDto>>> GetAllMandatesByMerchant(long merchantId, int? page, int? limit)
         {
@@ -115,6 +115,63 @@ namespace DDM.API.Web.Controllers.v1
             var pageSize = limit ?? 10;
 
             var response = await _adminService.GetAllMandateDetailListAsync(mandateId, fullPage, pageSize);
+            Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("dashboard/data-count")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public List<AdminDashboardCountDto> GetDashboardFieldCount()
+        {
+            return _adminService.GetDashboardFieldCount();
+        }
+
+        [HttpGet("mandates/completed-payments")]
+        [Authorize(Roles = UserRoles.Admin)]  //[FromForm] 
+        public async Task<ActionResult<PagedResponse<AllMandateWithDetailListDto>>> GetCompletedPaymentList(int? page, int? limit)
+        {
+            var fullPage = page ?? 1;
+            var pageSize = limit ?? 10;
+
+            var response = await _adminService.GetCompletedPaymentListAsync(fullPage, pageSize);
+            Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("mandates/this-year-mandate")]
+        [Authorize(Roles = UserRoles.Admin)]  //[FromForm] 
+        public async Task<ActionResult<PagedResponse<AllMandateListDto>>> GetThisYearMandate(int? page, int? limit)
+        {
+            var fullPage = page ?? 1;
+            var pageSize = limit ?? 10;
+
+            var response = await _adminService.GetThisYearMandateAsync(fullPage, pageSize);
+            Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("dashboard/current-year-monthly-mandate")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public List<AdminMonthlySumDto> GetDashboardMonthlyMandate()
+        {
+            return _adminService.GetMandateMonthlySum();
+        }
+
+        [HttpGet("dashboard/last-five-year-mandate")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public List<AdminYearlySumDto> GetDashboardFiveYearMandate()
+        {
+            return _adminService.GetFiveYearMandate();
+        }
+
+        [HttpGet("mandates/latest-mandate")]
+        [Authorize(Roles = UserRoles.Admin)]  //[FromForm] 
+        public async Task<ActionResult<PagedResponse<AllMandateListDto>>> GetLatestMandate(int? page, int? limit)
+        {
+            var fullPage = page ?? 1;
+            var pageSize = limit ?? 10;
+
+            var response = await _adminService.GetLatestMandateAsync(fullPage, pageSize);
             Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
             return new JsonResult(response);
         }

@@ -112,7 +112,7 @@ namespace DDM.API.Web.Controllers.v1
 
         [HttpGet("dashboard/data-count")]
         [Authorize(Roles = UserRoles.Merchant)]
-        public List<DashboardCountDto> GetDashboardFieldCount()
+        public List<MerchantDashboardCountDto> GetDashboardFieldCount()
         {
             return _merchantService.GetDashboardFieldCount();
         }

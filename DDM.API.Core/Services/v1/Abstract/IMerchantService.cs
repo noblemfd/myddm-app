@@ -20,7 +20,7 @@ namespace DDM.API.Core.Services.v1.Abstract
         Task<GenericResponseDto<MandateListDto>> GetMandateByIdAsync(long id);
         Task<GenericResponseDto<MerchantProfileDto>> GetMerchantProfileAsync();
         Task<GenericResponseDto<MerchantListDto>> GetMerchantByIdAsync(long id);
-        List<DashboardCountDto> GetDashboardFieldCount();
+        List<MerchantDashboardCountDto> GetDashboardFieldCount();
         Task<PagedResponse<MandateWithDetailListDto>> GetCompletedPaymentListAsync(int page, int limit);
         Task<PagedResponse<MandateListDto>> GetThisYearMandateAsync(int page, int limit);
         Task<PagedResponse<MandateListDto>> GetLatestMandateAsync(int page, int limit);
