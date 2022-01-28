@@ -152,5 +152,19 @@ namespace DDM.API.Web.Controllers.v1
             Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
             return new JsonResult(response);
         }
+
+        [HttpGet("dashboard/current-year-monthly-mandate")]
+        [Authorize(Roles = UserRoles.Merchant)]
+        public List<MerchantMonthlySumDto> GetDashboardMonthlyMandate()
+        {
+            return _merchantService.GetMandateMonthlySum();
+        }
+
+        [HttpGet("dashboard/last-five-year-mandate")]
+        [Authorize(Roles = UserRoles.Merchant)]
+        public List<MerchantYearlySumDto> GetDashboardFiveYearMandate()
+        {
+            return _merchantService.GetFiveYearMandate();
+        }
     }
 }

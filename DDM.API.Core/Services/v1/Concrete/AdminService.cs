@@ -553,14 +553,8 @@ namespace DDM.API.Core.Services.v1.Concrete
                     ItemSum = u.Sum(x => x.Amount),
                     Month = u.Key.Month,
                     MonthName = u.Key.Month.ToString("MMMM")
-                    //MonthName = u.Select(m => m.CreatedDate.Value.ToString("MMMM")).FirstOrDefault()
-                    //  MonthName = DateTime.ParseExact(MonthNameValue, "MMMM", CultureInfo.CurrentCulture).Month
                 })
                 .ToList();
-            // monthlyMandate.ForEach(var userdata in monthlyMandate)
-          //  DateTime dt = DateTime.Now;
-          //  Console.WriteLine(dt.ToString("MMMM"));
-         // .Select(m => m.Id).FirstOrDefault();
             return monthlyMandate;
         }
 

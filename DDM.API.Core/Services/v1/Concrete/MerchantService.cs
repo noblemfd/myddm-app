@@ -541,37 +541,49 @@ namespace DDM.API.Core.Services.v1.Concrete
             }
             return response;
         }
-        //public async Task<MandateListDto> GetMonthlyMandateAsync()
-        //{
-        //    var response = new PagedResponse<MandateListDto>();
-        //    DateTime current = DateTime.Now;
-        //    DateTime currentYear = DateTime.Parse($"{current.Year}/01/01");
-        //    var userName = _userResolverService.GetUserName();
-        //    var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
-        //    try
-        //    {
-        //        {
-        //            var mandateQueryable = _context.zib_mandates.AsQueryable().Where(m => m.CreatedDate >= currentYear).Where(m => m.MerchantId == merchantId);
-        //            var pagedMandates = await mandateQueryable.Include(l => l.MandateDetails)
-        //                                        .ThenInclude(l => l.Merchant)
-        //                                        .ThenInclude(e => e.User)
-        //                                        .ToPagedListAsync(page, limit);
 
-        //            response.Result = _mapper.Map<List<MandateListDto>>(pagedMandates.ToList());
-        //            response.TotalPages = pagedMandates.PageCount;
-        //            response.Page = pagedMandates.PageNumber;
-        //            response.PerPage = pagedMandates.PageSize;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        response.Error = new ErrorResponseDto()
-        //        {
-        //            ErrorCode = 500,
-        //            Message = ex.Message
-        //        };
-        //    }
-        //    return response;
-        //}
+        public List<MerchantMonthlySumDto> GetMandateMonthlySum()
+        {
+            DateTime current = DateTime.Now;
+            DateTime currentYear = DateTime.Parse($"{current.Year}/01/01");
+            var userName = _userResolverService.GetUserName();
+            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+
+            var monthlyMandate = _context.zib_mandates.Where(m => m.CreatedDate >= currentYear).Where(m => m.MerchantId == merchantId)
+                .GroupBy(o => new
+                {
+                    Month = o.CreatedDate.Value.Month
+                })
+                .Select(u => new MerchantMonthlySumDto
+                {
+                    ItemSum = u.Sum(x => x.Amount),
+                    Month = u.Key.Month,
+                    MonthName = u.Key.Month.ToString("MMMM")
+                })
+                .ToList();
+            return monthlyMandate;
+        }
+
+        public List<MerchantYearlySumDto> GetFiveYearMandate()
+        {
+            var userName = _userResolverService.GetUserName();
+            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var yearlyMandate = _context.zib_mandates.Where(m => m.CreatedDate > DateTime.Now.AddYears(-5)).Where(m => m.MerchantId == merchantId)
+                .GroupBy(o => o.CreatedDate.Value.Year)
+                .Select(u => new MerchantYearlySumDto
+                {
+                    ItemTotal = u.Sum(x => x.Amount),
+                    Year = u.Key
+                }
+                ).ToList();
+
+            //grand total
+            var tot = yearlyMandate.Sum(s => s.ItemTotal);
+
+            //apply percentage to each element
+            yearlyMandate.ForEach(s => s.ItemPercent = (int)((decimal)100.0 * s.ItemTotal / tot));
+
+            return yearlyMandate;
+        }
     }
 }

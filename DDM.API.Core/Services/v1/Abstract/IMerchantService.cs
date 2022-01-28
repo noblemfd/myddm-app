@@ -24,7 +24,7 @@ namespace DDM.API.Core.Services.v1.Abstract
         Task<PagedResponse<MandateWithDetailListDto>> GetCompletedPaymentListAsync(int page, int limit);
         Task<PagedResponse<MandateListDto>> GetThisYearMandateAsync(int page, int limit);
         Task<PagedResponse<MandateListDto>> GetLatestMandateAsync(int page, int limit);
-        //Task<MandateListDto> GetMonthlyMandateAsync();
-        //Task<MandateListDto> GetFiveYearMandateAsync();
+        List<MerchantMonthlySumDto> GetMandateMonthlySum();
+        List<MerchantYearlySumDto> GetFiveYearMandate();
     }
 }
