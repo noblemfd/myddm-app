@@ -64,6 +64,72 @@ namespace DDM.API.Web.Controllers.v1
             return new JsonResult(response);
         }
 
+        [HttpGet("mandates/approved-mandates")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<ActionResult<PagedResponse<AllMandateListDto>>> GetMandateApproved(int? page, int? limit)
+        {
+            var fullPage = page ?? 1;
+            var pageSize = limit ?? 10;
+
+            var response = await _adminService.GetMandateApprovedAsync(fullPage, pageSize);
+            Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("mandates/approved-mandates-by-acctno/{custAccountNo}")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<ActionResult<PagedResponse<AllMandateListDto>>> GetMandateApprovedByCustomer(string custAccountNo, int? page, int? limit)
+        {
+            var fullPage = page ?? 1;
+            var pageSize = limit ?? 10;
+
+            var response = await _adminService.GetMandateApprovedByCustomerAsync(custAccountNo, fullPage, pageSize);
+            Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("mandates/approved-mandates-by-acctno-refno/{custAccountNo}/{mandateRefNo}")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<ActionResult<GenericResponseDto<AllMandateListDto>>> GetMandateApprovedByCustomerRef(string custAccountNo, string mandateRefNo)
+        {
+            var response = await _adminService.GetMandateApprovedByCustomerRefAsync(custAccountNo, mandateRefNo);
+            Response.StatusCode = response.StatusCode ?? StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("mandates/mandate-payment")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<ActionResult<PagedResponse<AllMandateDetailListDto>>> GetMandatePayment(int? page, int? limit)
+        {
+            var fullPage = page ?? 1;
+            var pageSize = limit ?? 10;
+
+            var response = await _adminService.GetMandatePaymentAsync(fullPage, pageSize);
+            Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("mandates/mandate-payment-by-acctno/{custAccountNo}")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<ActionResult<PagedResponse<AllMandateDetailListDto>>> GetMandatePaymentByCutomer(string custAccountNo, int? page, int? limit)
+        {
+            var fullPage = page ?? 1;
+            var pageSize = limit ?? 10;
+
+            var response = await _adminService.GetMandatePaymentByCutomerAsync(custAccountNo, fullPage, pageSize);
+            Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("mandates/mandate-payment-by-acctno-refno/{custAccountNo}/{mandateRefNo}")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<ActionResult<GenericResponseDto<AllMandateDetailListDto>>> GetMandatePaymentByCustomerRef(string custAccountNo, string mandateRefNo)
+        {
+            var response = await _adminService.GetMandatePaymentByCustomerRefAsync(custAccountNo, mandateRefNo);
+            Response.StatusCode = response.StatusCode ?? StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
         [HttpGet("merchant/{id}")]
         [Authorize(Roles = UserRoles.Admin)]
         public async Task<ActionResult<GenericResponseDto<AllMerchantListDto>>> GetMerchant(long id)

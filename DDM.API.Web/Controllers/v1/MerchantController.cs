@@ -83,7 +83,7 @@ namespace DDM.API.Web.Controllers.v1
             return new JsonResult(response);
         }
 
-        [HttpGet("mandates/approved-mandates-acctno/{custAccountNo}")]
+        [HttpGet("mandates/approved-mandates-by-acctno/{custAccountNo}")]
         [Authorize(Roles = UserRoles.Merchant)]
         public async Task<ActionResult<PagedResponse<MandateListDto>>> GetMandateApprovedByCustomer(string custAccountNo, int? page, int? limit)
         {
@@ -95,11 +95,44 @@ namespace DDM.API.Web.Controllers.v1
             return new JsonResult(response);
         }
 
-        [HttpGet("mandates/approved-mandates-acctno-refno/{custAccountNo}/{mandateRefNo}")]
+        [HttpGet("mandates/approved-mandates-by-acctno-refno/{custAccountNo}/{mandateRefNo}")]
         [Authorize(Roles = UserRoles.Merchant)]
         public async Task<ActionResult<GenericResponseDto<MandateListDto>>> GetMandateApprovedByCustomerRef(string custAccountNo, string mandateRefNo)
         {
             var response = await _merchantService.GetMandateApprovedByCustomerRefAsync(custAccountNo, mandateRefNo);
+            Response.StatusCode = response.StatusCode ?? StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("mandates/mandate-payment")]
+        [Authorize(Roles = UserRoles.Merchant)]
+        public async Task<ActionResult<PagedResponse<MandateDetailListDto>>> GetMandatePayment(int? page, int? limit)
+        {
+            var fullPage = page ?? 1;
+            var pageSize = limit ?? 10;
+
+            var response = await _merchantService.GetMandatePaymentAsync(fullPage, pageSize);
+            Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("mandates/mandate-payment-by-acctno/{custAccountNo}")]
+        [Authorize(Roles = UserRoles.Merchant)]
+        public async Task<ActionResult<PagedResponse<MandateDetailListDto>>> GetMandatePaymentByCutomer(string custAccountNo, int? page, int? limit)
+        {
+            var fullPage = page ?? 1;
+            var pageSize = limit ?? 10;
+
+            var response = await _merchantService.GetMandatePaymentByCutomerAsync(custAccountNo, fullPage, pageSize);
+            Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("mandates/mandate-payment-by-acctno-refno/{custAccountNo}/{mandateRefNo}")]
+        [Authorize(Roles = UserRoles.Merchant)]
+        public async Task<ActionResult<GenericResponseDto<MandateDetailListDto>>> GetMandatePaymentByCustomerRef(string custAccountNo, string mandateRefNo)
+        {
+            var response = await _merchantService.GetMandatePaymentByCustomerRefAsync(custAccountNo, mandateRefNo);
             Response.StatusCode = response.StatusCode ?? StatusCodes.Status200OK;
             return new JsonResult(response);
         }

@@ -18,6 +18,12 @@ namespace DDM.API.Core.Services.v1.Abstract
         Task<PagedResponse<AllMerchantListDto>> GetMerchantAsync(int page, int limit);
         Task<GenericResponseDto<AllMerchantListDto>> GetMerchantByIdAsync(long id);
         Task<PagedResponse<AllMandateWithDetailListDto>> GetMandateWithDetailListAsync(int page, int limit);
+        Task<PagedResponse<AllMandateListDto>> GetMandateApprovedAsync(int page, int limit);
+        Task<PagedResponse<AllMandateListDto>> GetMandateApprovedByCustomerAsync(string custAccountNo, int page, int limit);
+        Task<GenericResponseDto<AllMandateListDto>> GetMandateApprovedByCustomerRefAsync(string custAccountNo, string mandateRefNo);
+        Task<PagedResponse<AllMandateDetailListDto>> GetMandatePaymentAsync(int page, int limit);
+        Task<PagedResponse<AllMandateDetailListDto>> GetMandatePaymentByCutomerAsync(string custAccountNo, int page, int limit);
+        Task<GenericResponseDto<AllMandateDetailListDto>> GetMandatePaymentByCustomerRefAsync(string custAccountNo, string mandateRefNo);
         //Task<GenericResponseDto<AllMerchantListDto>> UpdateMerchantAsync(long id, MerchantCreateDto requestDto);
         Task<GenericResponseDto<bool>> DeleteMerchantAsync(long id);
         Task<PagedResponse<AllMandateListDto>> GetAllMandateAsync(int page, int limit);
