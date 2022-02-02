@@ -9,7 +9,7 @@ namespace DDM.API.Core.DTOs.v1.Merchant.Response
     public class MerchantYearlySumDto
     {
         public decimal ItemTotal { get; set; }
-        public int ItemPercent { get; set; }
+        public decimal ItemPercent { get; set; }
         public int Year { get; set; }
     }
 }

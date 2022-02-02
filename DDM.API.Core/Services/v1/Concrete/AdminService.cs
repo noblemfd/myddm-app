@@ -13,9 +13,9 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using X.PagedList;
+using System.Globalization;
 
 namespace DDM.API.Core.Services.v1.Concrete
 {
@@ -759,7 +759,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     ItemSum = u.Sum(x => x.Amount),
                     Month = u.Key.Month,
-                    MonthName = u.Key.Month.ToString("MMMM")
+                    MonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(u.Key.Month)
                 })
                 .ToList();
             return monthlyMandate;
@@ -772,15 +772,14 @@ namespace DDM.API.Core.Services.v1.Concrete
                 .Select(u => new AdminYearlySumDto
                 {
                     ItemTotal = u.Sum(x => x.Amount),
-                    Year = u.Key 
-        }
+                    Year = u.Key
+                }
                 ).ToList();
 
             //grand total
             var tot = yearlyMandate.Sum(s => s.ItemTotal);
-
             //apply percentage to each element
-            yearlyMandate.ForEach(s => s.ItemPercent = (int)((decimal)100.0 * s.ItemTotal / tot));
+            yearlyMandate.ForEach(s => s.ItemPercent = Math.Round(((decimal)100.0 * (s.ItemTotal / tot)), 2));
 
             return yearlyMandate;
         }
