@@ -15,6 +15,10 @@ namespace DDM.API.Core.ProfileMapping.v1
     {
         public MerchantMapperProfile()
         {
+            CreateMap<MerchantUserCreateDto, MerchantUser>()
+                //.ForMember(u => u.PasswordHash, options => options.Ignore())
+                .ForMember(e => e.User, options => options.Ignore()).ReverseMap();
+
             CreateMap<MandateCreateDto, Mandate>().ReverseMap();
 
             CreateMap<Merchant, MerchantProfileDto>()

@@ -46,5 +46,6 @@ namespace DDM.API.Infrastructure.Entities.Models
 
         public virtual ICollection<Mandate> Mandates { get; set; }
         public virtual ICollection<MandateDetail> MandateDetails { get; set; }
+        public virtual ICollection<MerchantUser> MerchantUsers { get; set; }
     }
 }

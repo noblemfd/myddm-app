@@ -27,6 +27,7 @@ namespace DDM.API.Infrastructure.Data.Application
         public DbSet<MandateDetail> zib_mandate_details { get; set; }
         public DbSet<Merchant> zib_merchants { get; set; }
         public DbSet<StaffMember> zib_staff_members { get; set; }
+        public DbSet<MerchantUser> zib_merchant_users { get; set; }
         public DbSet<NotificationLog> zib_notification_logs { get; set; }
         public DbSet<TransactionLog> zib_transaction_logs { get; set; }
         public DbSet<TokenLog> zib_logs { get; set; }
@@ -86,6 +87,15 @@ namespace DDM.API.Infrastructure.Data.Application
                 entity.Property(m => m.ChargeRequired).HasDefaultValue((ChargeRequired)0);
                 entity.HasIndex(m => m.MerchantName).IsUnique();
                 entity.HasIndex(m => m.AccountNumber).IsUnique();
+                entity.Property(m => m.IsDeleted).HasDefaultValue(false);
+                entity.Property(m => m.CreatedDate).HasColumnType("datetime");
+                entity.Property(m => m.LastUpdatedDate).HasColumnType("datetime");
+            });
+            builder.Entity<MerchantUser>(entity =>
+            {
+                entity.Property(m => m.Id).ValueGeneratedOnAdd();
+                entity.HasIndex(m => new { m.MerchantId, m.UserId }).IsUnique();
+                entity.Property(m => m.IsMerchantAdmin).HasDefaultValue(false);
                 entity.Property(m => m.IsDeleted).HasDefaultValue(false);
                 entity.Property(m => m.CreatedDate).HasColumnType("datetime");
                 entity.Property(m => m.LastUpdatedDate).HasColumnType("datetime");

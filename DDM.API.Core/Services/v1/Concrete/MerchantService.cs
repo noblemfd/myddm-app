@@ -286,6 +286,118 @@ namespace DDM.API.Core.Services.v1.Concrete
             }
             return response;
         }
+        public async Task<PagedResponse<MandateListDto>> GetMandateApprovedAsync(int page, int limit)
+        {
+            var response = new PagedResponse<MandateListDto>();
+            var userName = _userResolverService.GetUserName();
+            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            try
+            {
+                if (page >= 1 && limit >= 1)
+                {
+                    var mandateQueryable = _context.zib_mandates.AsQueryable().Where(m => m.MerchantId == merchantId).Where(m => (bool)m.IsApproved);
+                    var pagedMandates = await mandateQueryable.Include(l => l.MandateDetails)
+                                                .ThenInclude(l => l.Merchant)
+                                                .ThenInclude(e => e.User)
+                                                .ToPagedListAsync(page, limit);
+
+                    response.Result = _mapper.Map<List<MandateListDto>>(pagedMandates.ToList());
+                    response.TotalPages = pagedMandates.PageCount;
+                    response.Page = pagedMandates.PageNumber;
+                    response.PerPage = pagedMandates.PageSize;
+                }
+                else
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 400,
+                        Message = "The page number and page size must be greater than 1!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+            return response;
+        }
+        public async Task<PagedResponse<MandateListDto>> GetMandateApprovedByCustomerAsync(string custAccountNo, int page, int limit)
+        {
+            var response = new PagedResponse<MandateListDto>();
+            var userName = _userResolverService.GetUserName();
+            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            try
+            {
+                if (page >= 1 && limit >= 1)
+                {
+                    var mandateQueryable = _context.zib_mandates.AsQueryable().Where(m => m.MerchantId == merchantId).Where(m => m.DrAccountNumber == custAccountNo && (bool)m.IsApproved);
+                    var pagedMandates = await mandateQueryable.Include(l => l.MandateDetails)
+                                                .ThenInclude(l => l.Merchant)
+                                                .ThenInclude(e => e.User)
+                                                .ToPagedListAsync(page, limit);
+
+                    response.Result = _mapper.Map<List<MandateListDto>>(pagedMandates.ToList());
+                    response.TotalPages = pagedMandates.PageCount;
+                    response.Page = pagedMandates.PageNumber;
+                    response.PerPage = pagedMandates.PageSize;
+                }
+                else
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 400,
+                        Message = "The page number and page size must be greater than 1!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+            return response;
+        }
+        public async Task<GenericResponseDto<MandateListDto>> GetMandateApprovedByCustomerRefAsync(string custAccountNo, string mandateRefNo)
+        {
+            var response = new GenericResponseDto<MandateListDto>();
+            var userName = _userResolverService.GetUserName();
+            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            try
+            {
+                var custMandate = await _context.zib_mandates.Include(m => m.Merchant).ThenInclude(m => m.User).FirstOrDefaultAsync(m => m.MerchantId == merchantId && m.DrAccountNumber == custAccountNo && m.ReferenceNumber == mandateRefNo && (bool)m.IsApproved);
+                if (custMandate != null)
+                {
+                    response.Result = _mapper.Map<MandateListDto>(custMandate);
+                    response.Message = "Successfully Retrieved Mandate";
+                    response.StatusCode = 200;
+                }
+                else
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 404,
+                        Message = "Mandate not found!"
+                    };
+                    response.StatusCode = 404;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+            return response;
+        }
         public async Task<PagedResponse<MandateListDto>> GetMandateByCutomerAsync(string custAccountNo, int page, int limit)
         {
             var response = new PagedResponse<MandateListDto>();
