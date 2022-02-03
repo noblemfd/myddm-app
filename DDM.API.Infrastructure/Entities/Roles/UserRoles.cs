@@ -12,5 +12,6 @@ namespace DDM.API.Infrastructure.Entities.Roles
         public const string Merchant = "Merchant";
         public const string Staff = "Staff";
         public const string User = "User";
+        public const string MerchantUser = "MerchantUser";
     }
 }

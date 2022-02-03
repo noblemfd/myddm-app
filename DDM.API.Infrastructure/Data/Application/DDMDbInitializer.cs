@@ -48,6 +48,13 @@ namespace DDM.API.Infrastructure.Data.Application
                 IdentityResult roleResult = roleManager.
                 CreateAsync(role).Result;
             }
+            if (!roleManager.RoleExistsAsync("MerchantUser").Result)
+            {
+                ApplicationRole role = new ApplicationRole();
+                role.Name = "MerchantUser";
+                IdentityResult roleResult = roleManager.
+                CreateAsync(role).Result;
+            }
         }
         public static void SeedUsers(UserManager<ApplicationUser> userManager)
         {
