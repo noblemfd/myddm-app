@@ -24,17 +24,47 @@ namespace DDM.API.Core.Services.v1.Concrete
         private readonly DDMDbContext _context;
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
+        //private readonly IUserService _userService;
+        //private readonly PasswordHasher<ApplicationUser> _passwordHasher;
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly UserResolverService _userResolverService;
 
         public AdminService(DDMDbContext context, IMapper mapper, UserResolverService userResolverService, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
+      //  public AdminService(DDMDbContext context, IMapper mapper, UserResolverService userResolverService, IUserService userService, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
             _context = context;
             _mapper = mapper;
             _userManager = userManager;
+            //_userService = userService;
+            //_passwordHasher = passwordHasher;
             _roleManager = roleManager;
             _userResolverService = userResolverService;
         }
+        //public Task<IEnumerable<ApplicationUser>> GetAllActiveUsers()
+        //{
+        //    var activeUsers = this._context.Users
+        //        .Include(u => u.UserRoles)
+        //        .Where(u => u.IsDeleted == false)
+        //        .OrderBy(u => u.FirstName)
+        //        .ThenBy(u => u.LastName)
+        //        .ToList();
+
+        //    return Task.FromResult(activeUsers.AsEnumerable());
+        //}
+        //public async Task<bool> Lock(long id)
+        //{
+        //    var userToLock = await _userService.GetUserById(id);
+        //    await _userManager.SetLockoutEndDateAsync(userToLock, DateTime.Now.AddHours(1));
+        //    int result = await _context.SaveChangesAsync();
+        //    return result > 0;
+        //}
+        //public async Task<bool> Unlock(long id)
+        //{
+        //    var userToUnLock = await _userService.GetUserById(id);
+        //    await _userManager.SetLockoutEndDateAsync(userToUnLock, null);
+        //    int result = await _context.SaveChangesAsync();
+        //    return result > 0;
+        //}
         public async Task<GenericResponseDto<AdminUserDto>> CreateAdminUserAsync(AdminCreateDto requestDto)
         {
             var response = new GenericResponseDto<AdminUserDto>();
@@ -66,7 +96,7 @@ namespace DDM.API.Core.Services.v1.Concrete
         }
         public async Task<GenericResponseDto<AllMerchantListDto>> CreateMerchantAsync(MerchantCreateDto requestDto)
         {
-            var existingMerchant = await _context.zib_merchants.FirstOrDefaultAsync(e => e.User.UserName == requestDto.UserName);
+            var existingMerchant = await _context.zib_merchants.FirstOrDefaultAsync(e => e.User.UserName == requestDto.UserName || e.MerchantName == requestDto.MerchantName);
             var response = new GenericResponseDto<AllMerchantListDto>();
             var userName = _userResolverService.GetUserName();
 
@@ -208,6 +238,68 @@ namespace DDM.API.Core.Services.v1.Concrete
 
             return response;
         }
+        public async Task<PagedResponse<AllMerchantListDto>> GetMerchantWithUserAsync(int page, int limit)
+        {
+            var response = new PagedResponse<AllMerchantListDto>();
+            try
+            {
+                if (page >= 1 && limit >= 1)
+                {
+
+                    var merchantQueryable = _context.zib_merchants.Include(e => e.User).Include(e => e.MerchantUsers).AsQueryable();
+                    var pagedMerchants = await merchantQueryable.ToPagedListAsync(page, limit);
+
+                    response.Result = _mapper.Map<List<AllMerchantListDto>>(pagedMerchants.ToList());
+                    response.TotalPages = pagedMerchants.PageCount;
+                    response.Page = pagedMerchants.PageNumber;
+                    response.PerPage = pagedMerchants.PageSize;
+                }
+                else
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 400,
+                        Message = "The page number and page size must be greater than 1!"
+                    };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+
+            return response;
+        }
+        public async Task<GenericResponseDto<AllMerchantListDto>> GetMerchantWithUserByIdAsync(long id)
+        {
+            var response = new GenericResponseDto<AllMerchantListDto>();
+
+            var merchant = await _context.zib_merchants.Include(e => e.User).Include(e => e.MerchantUsers)
+                                                .FirstOrDefaultAsync(e => e.Id == id);
+
+            if (merchant != null)
+            {
+                response.Result = _mapper.Map<AllMerchantListDto>(merchant);
+                response.Message = "Successfully Retrieved Merchant";
+                response.StatusCode = 200;
+            }
+            else
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 404,
+                    Message = "Merchant not found!"
+                };
+                response.StatusCode = 404;
+            }
+
+            return response;
+        }
 
         //public async Task<GenericResponseDto<AllMerchantListDto>> UpdateMerchantAsync(long id, MerchantCreateDto request)
         //{
@@ -282,6 +374,112 @@ namespace DDM.API.Core.Services.v1.Concrete
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+            return response;
+        }
+        public async Task<PagedResponse<AllMandateListDto>> GetMandateCancelledAsync(int page, int limit)
+        {
+            var response = new PagedResponse<AllMandateListDto>();
+            try
+            {
+                if (page >= 1 && limit >= 1)
+                {
+                    var mandateQueryable = _context.zib_mandates.AsQueryable().Where(m => (bool)m.IsCancelled);
+                    var pagedMandates = await mandateQueryable.Include(l => l.MandateDetails)
+                                                .ThenInclude(l => l.Merchant)
+                                                .ThenInclude(e => e.User)
+                                                .ToPagedListAsync(page, limit);
+
+                    response.Result = _mapper.Map<List<AllMandateListDto>>(pagedMandates.ToList());
+                    response.TotalPages = pagedMandates.PageCount;
+                    response.Page = pagedMandates.PageNumber;
+                    response.PerPage = pagedMandates.PageSize;
+                }
+                else
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 400,
+                        Message = "The page number and page size must be greater than 1!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+            return response;
+        }
+        public async Task<PagedResponse<AllMandateListDto>> GetMandateCancelledByCustomerAsync(string custAccountNo, int page, int limit)
+        {
+            var response = new PagedResponse<AllMandateListDto>();
+            try
+            {
+                if (page >= 1 && limit >= 1)
+                {
+                    var mandateQueryable = _context.zib_mandates.AsQueryable().Where(m => m.DrAccountNumber == custAccountNo && (bool)m.IsCancelled);
+                    var pagedMandates = await mandateQueryable.Include(l => l.MandateDetails)
+                                                .ThenInclude(l => l.Merchant)
+                                                .ThenInclude(e => e.User)
+                                                .ToPagedListAsync(page, limit);
+
+                    response.Result = _mapper.Map<List<AllMandateListDto>>(pagedMandates.ToList());
+                    response.TotalPages = pagedMandates.PageCount;
+                    response.Page = pagedMandates.PageNumber;
+                    response.PerPage = pagedMandates.PageSize;
+                }
+                else
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 400,
+                        Message = "The page number and page size must be greater than 1!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+            return response;
+        }
+        public async Task<GenericResponseDto<AllMandateListDto>> GetMandateCancelledByCustomerRefAsync(string custAccountNo, string mandateRefNo)
+        {
+            var response = new GenericResponseDto<AllMandateListDto>();
+            try
+            {
+                var custMandate = await _context.zib_mandates.Include(m => m.Merchant).ThenInclude(m => m.User).FirstOrDefaultAsync(m => m.DrAccountNumber == custAccountNo && m.ReferenceNumber == mandateRefNo && (bool)m.IsCancelled);
+                if (custMandate != null)
+                {
+                    response.Result = _mapper.Map<AllMandateListDto>(custMandate);
+                    response.Message = "Successfully Retrieved Mandate";
+                    response.StatusCode = 200;
+                }
+                else
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 404,
+                        Message = "Mandate not found!"
+                    };
+                    response.StatusCode = 404;
                 }
             }
             catch (Exception ex)

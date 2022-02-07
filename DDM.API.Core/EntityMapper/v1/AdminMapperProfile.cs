@@ -35,6 +35,7 @@ namespace DDM.API.Core.EntityMapper.v1
             CreateMap<Merchant, AllMerchantListDto>().ReverseMap();
 
             CreateMap<ApplicationUser, AllUserListDto>().ReverseMap();
+            CreateMap<MerchantUser, AllMerchantUserListDto>().ReverseMap();
         }
     }
 }

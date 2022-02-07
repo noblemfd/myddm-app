@@ -46,7 +46,8 @@ namespace DDM.API.Infrastructure.Entities.Models
 
         [Column(TypeName = "varchar(500)")]
         public string CancellationNote { get; set; }
-        public DateTime? MandateCancellationDate { get; set; }
+        public string CancellationBy { get; set; }
+        public DateTime? CancellationDate { get; set; }
 
         [ForeignKey("MerchantId")]
         public virtual Merchant Merchant { get; set; }

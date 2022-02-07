@@ -335,13 +335,14 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                     PaymentFrequency = table.Column<byte>(type: "tinyint", nullable: true),
                     PaymentCount = table.Column<int>(type: "int", nullable: true),
                     IsApproved = table.Column<bool>(type: "bit", nullable: true, defaultValue: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     RequestedBy = table.Column<string>(type: "varchar(200)", nullable: true),
                     ApprovedBy = table.Column<string>(type: "varchar(200)", nullable: true),
                     ApprovedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsCancelled = table.Column<bool>(type: "bit", nullable: true, defaultValue: false),
                     CancellationNote = table.Column<string>(type: "varchar(500)", nullable: true),
-                    MandateCancellationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CancellationBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CancellationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -353,6 +354,38 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                     table.PrimaryKey("PK_zib_mandates", x => x.Id);
                     table.ForeignKey(
                         name: "FK_zib_mandates_zib_merchants_MerchantId",
+                        column: x => x.MerchantId,
+                        principalTable: "zib_merchants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "zib_merchant_users",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MerchantId = table.Column<long>(type: "bigint", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    IsMerchantAdmin = table.Column<bool>(type: "bit", nullable: true, defaultValue: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastUpdatedDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValue: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_zib_merchant_users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_zib_merchant_users_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_zib_merchant_users_zib_merchants_MerchantId",
                         column: x => x.MerchantId,
                         principalTable: "zib_merchants",
                         principalColumn: "Id",
@@ -518,6 +551,17 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                 filter: "[ReferenceNumber] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_zib_merchant_users_MerchantId_UserId",
+                table: "zib_merchant_users",
+                columns: new[] { "MerchantId", "UserId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_zib_merchant_users_UserId",
+                table: "zib_merchant_users",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_zib_merchants_AccountNumber",
                 table: "zib_merchants",
                 column: "AccountNumber",
@@ -582,6 +626,9 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
 
             migrationBuilder.DropTable(
                 name: "zib_mandate_details");
+
+            migrationBuilder.DropTable(
+                name: "zib_merchant_users");
 
             migrationBuilder.DropTable(
                 name: "zib_notification_logs");

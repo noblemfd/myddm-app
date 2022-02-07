@@ -19,15 +19,112 @@ namespace DDM.API.Web.Controllers.v1
     public class MerchantController : BaseApiController
     {
         private readonly IMerchantService _merchantService;
-        //private readonly UserManager<ApplicationUser> _userManager;
         public MerchantController(IMerchantService merchantService)
         {
-            //_userManager = userManager;
             _merchantService = merchantService;
         }
 
+        [HttpPost("merchant/add-merchant-user")]
+        [Authorize(Roles = "Merchant, MerchantUser")]  //[FromForm] 
+        public async Task<ActionResult<GenericResponseDto<MerchantUserListDto>>> CreateMerchantUser(MerchantUserCreateDto requestDto)
+        {
+            var response = await _merchantService.CreateMerchantUserAsync(requestDto);
+            Response.StatusCode = response.StatusCode ?? StatusCodes.Status201Created;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("merchants/merchant-users")]
+      //  [Authorize(Roles = UserRoles.Merchant)]
+        [Authorize(Roles = "Merchant, MerchantUser")]
+        public async Task<ActionResult<PagedResponse<MerchantUserListDto>>> GetMerchantUser(int? page, int? limit)
+        {
+            var fullPage = page ?? 1;
+            var pageSize = limit ?? 10;
+
+            var response = await _merchantService.GetMerchantUserAsync(fullPage, pageSize);
+            Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("merchants/merchant-user/{id}")]
+      //  [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
+        [Authorize(Roles = "Merchant, MerchantUser")]
+        public async Task<ActionResult<GenericResponseDto<MerchantUserListDto>>> GetMerchantUserById(long id)
+        {
+            var response = await _merchantService.GetMerchantUserByIdAsync(id);
+            Response.StatusCode = response.StatusCode ?? StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpPut("merchants/update-merchant-user/{id}")]
+        //  [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
+        [Authorize(Roles = "Merchant, MerchantUser")]
+        public async Task<ActionResult<GenericResponseDto<MerchantUserListDto>>> UpdateMerchantUser(long id, MerchantUserUpdateDto requestDto)
+        {
+            var response = await _merchantService.UpdateMerchantUserAsync(id, requestDto);
+            Response.StatusCode = response.StatusCode ?? StatusCodes.Status201Created;
+            return new JsonResult(response);
+        }
+
+        [HttpPut("mandate/cancel/{id}")]
+        //  [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
+        [Authorize(Roles = "Merchant, MerchantUser")]
+        public async Task<ActionResult<GenericResponseDto<MandateListDto>>> CancelMandate(long id, MandateCancelDto requestDto)
+        {
+            var response = await _merchantService.CancelMandateAsync(id, requestDto);
+            Response.StatusCode = response.StatusCode ?? StatusCodes.Status201Created;
+            return new JsonResult(response);
+        }
+
+        [HttpPut("mandate/cancel-by-cust-refno/{custAccountNo}/{mandateRefNo}")]
+        //  [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
+        [Authorize(Roles = "Merchant, MerchantUser")]
+        public async Task<ActionResult<GenericResponseDto<MandateListDto>>> CancelMandateByCustRef(string custAccountNo, string mandateRefNo, MandateCancelDto requestDto)
+        {
+            var response = await _merchantService.CancelMandateByCustomerRefAsync(custAccountNo, mandateRefNo, requestDto);
+            Response.StatusCode = response.StatusCode ?? StatusCodes.Status201Created;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("mandates/cancelled-mandates")]
+        //  [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
+        [Authorize(Roles = "Merchant, MerchantUser")]
+        public async Task<ActionResult<PagedResponse<MandateListDto>>> GetMandateCancelled(int? page, int? limit)
+        {
+            var fullPage = page ?? 1;
+            var pageSize = limit ?? 10;
+
+            var response = await _merchantService.GetMandateCancelledAsync(fullPage, pageSize);
+            Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("mandates/cancelled-mandates-by-acctno/{custAccountNo}")]
+        //  [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
+        [Authorize(Roles = "Merchant, MerchantUser")]
+        public async Task<ActionResult<PagedResponse<MandateListDto>>> GetMandateCancelledByCustomer(string custAccountNo, int? page, int? limit)
+        {
+            var fullPage = page ?? 1;
+            var pageSize = limit ?? 10;
+
+            var response = await _merchantService.GetMandateCancelledByCustomerAsync(custAccountNo, fullPage, pageSize);
+            Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("mandates/cancelled-mandates-by-acctno-refno/{custAccountNo}/{mandateRefNo}")]
+        //  [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
+        [Authorize(Roles = "Merchant, MerchantUser")]
+        public async Task<ActionResult<GenericResponseDto<MandateListDto>>> GetMandateCancelledByCustomerRef(string custAccountNo, string mandateRefNo)
+        {
+            var response = await _merchantService.GetMandateCancelledByCustomerRefAsync(custAccountNo, mandateRefNo);
+            Response.StatusCode = response.StatusCode ?? StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
         [HttpPost("mandate/add")]
-        [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
+        // [Authorize(Roles = UserRoles.Merchant)]  //[FromForm]
+        [Authorize(Roles = "Merchant, MerchantUser")]
         public async Task<ActionResult<GenericResponseDto<MandateListDto>>> AddMandate(MandateCreateDto request)
         {
             var response = await _merchantService.CreateMerchantMandateAsync(request);
@@ -36,7 +133,8 @@ namespace DDM.API.Web.Controllers.v1
         }
 
         [HttpGet("mandates")]
-        [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
+        // [Authorize(Roles = UserRoles.Merchant)]  //[FromForm]
+        [Authorize(Roles = "Merchant, MerchantUser")]
         public async Task<ActionResult<PagedResponse<MandateListDto>>> GetMandates(int? page, int? limit)
         {
             var fullPage = page ?? 1;
@@ -48,7 +146,8 @@ namespace DDM.API.Web.Controllers.v1
         }
 
         [HttpGet("mandates/mandate-details/{mandateId}")]
-        [Authorize(Roles = UserRoles.Merchant)]
+        // [Authorize(Roles = UserRoles.Merchant)]  //[FromForm]
+        [Authorize(Roles = "Merchant, MerchantUser")]
         public async Task<ActionResult<PagedResponse<MandateDetailListDto>>> GetMandateDetails(long mandateId, int? page, int? limit)
         {
             var fullPage = page ?? 1;
@@ -60,7 +159,8 @@ namespace DDM.API.Web.Controllers.v1
         }
 
         [HttpGet("mandates/mandate-with-details")]
-        [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
+        // [Authorize(Roles = UserRoles.Merchant)]  //[FromForm]
+        [Authorize(Roles = "Merchant, MerchantUser")]
         public async Task<ActionResult<PagedResponse<MandateWithDetailListDto>>> GetMandateWithDetails(int? page, int? limit)
         {
             var fullPage = page ?? 1;
@@ -72,7 +172,8 @@ namespace DDM.API.Web.Controllers.v1
         }
 
         [HttpGet("mandates/approved-mandates")]
-        [Authorize(Roles = UserRoles.Merchant)]
+        // [Authorize(Roles = UserRoles.Merchant)]  //[FromForm]
+        [Authorize(Roles = "Merchant, MerchantUser")]
         public async Task<ActionResult<PagedResponse<MandateListDto>>> GetMandateApproved(int? page, int? limit)
         {
             var fullPage = page ?? 1;
@@ -84,7 +185,8 @@ namespace DDM.API.Web.Controllers.v1
         }
 
         [HttpGet("mandates/approved-mandates-by-acctno/{custAccountNo}")]
-        [Authorize(Roles = UserRoles.Merchant)]
+        // [Authorize(Roles = UserRoles.Merchant)]  //[FromForm]
+        [Authorize(Roles = "Merchant, MerchantUser")]
         public async Task<ActionResult<PagedResponse<MandateListDto>>> GetMandateApprovedByCustomer(string custAccountNo, int? page, int? limit)
         {
             var fullPage = page ?? 1;
@@ -96,7 +198,8 @@ namespace DDM.API.Web.Controllers.v1
         }
 
         [HttpGet("mandates/approved-mandates-by-acctno-refno/{custAccountNo}/{mandateRefNo}")]
-        [Authorize(Roles = UserRoles.Merchant)]
+        // [Authorize(Roles = UserRoles.Merchant)]  //[FromForm]
+        [Authorize(Roles = "Merchant, MerchantUser")]
         public async Task<ActionResult<GenericResponseDto<MandateListDto>>> GetMandateApprovedByCustomerRef(string custAccountNo, string mandateRefNo)
         {
             var response = await _merchantService.GetMandateApprovedByCustomerRefAsync(custAccountNo, mandateRefNo);
@@ -105,7 +208,8 @@ namespace DDM.API.Web.Controllers.v1
         }
 
         [HttpGet("mandates/mandate-payment")]
-        [Authorize(Roles = UserRoles.Merchant)]
+        // [Authorize(Roles = UserRoles.Merchant)]  //[FromForm]
+        [Authorize(Roles = "Merchant, MerchantUser")]
         public async Task<ActionResult<PagedResponse<MandateDetailListDto>>> GetMandatePayment(int? page, int? limit)
         {
             var fullPage = page ?? 1;
@@ -129,7 +233,8 @@ namespace DDM.API.Web.Controllers.v1
         }
 
         [HttpGet("mandates/mandate-payment-by-acctno-refno/{custAccountNo}/{mandateRefNo}")]
-        [Authorize(Roles = UserRoles.Merchant)]
+        // [Authorize(Roles = UserRoles.Merchant)]  //[FromForm]
+        [Authorize(Roles = "Merchant, MerchantUser")]
         public async Task<ActionResult<GenericResponseDto<MandateDetailListDto>>> GetMandatePaymentByCustomerRef(string custAccountNo, string mandateRefNo)
         {
             var response = await _merchantService.GetMandatePaymentByCustomerRefAsync(custAccountNo, mandateRefNo);
@@ -138,7 +243,8 @@ namespace DDM.API.Web.Controllers.v1
         }
 
         [HttpGet("mandates/mandate-by-customer/{custAccountNo}")]
-        [Authorize(Roles = UserRoles.Merchant)]
+        // [Authorize(Roles = UserRoles.Merchant)]  //[FromForm]
+        [Authorize(Roles = "Merchant, MerchantUser")]
         public async Task<ActionResult<PagedResponse<MandateListDto>>> GetMandateByCutomers(string custAccountNo, int? page, int? limit)
         {
             var fullPage = page ?? 1;
@@ -150,7 +256,8 @@ namespace DDM.API.Web.Controllers.v1
         }
 
         [HttpGet("mandates/{id}")]
-        [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
+        // [Authorize(Roles = UserRoles.Merchant)]  //[FromForm]
+        [Authorize(Roles = "Merchant, MerchantUser")]
         public async Task<ActionResult<GenericResponseDto<MandateListDto>>> GetMandateById(long id)
         {
             var response = await _merchantService.GetMandateByIdAsync(id);
@@ -159,7 +266,8 @@ namespace DDM.API.Web.Controllers.v1
         }
 
         [HttpGet("profile")]
-        [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
+        // [Authorize(Roles = UserRoles.Merchant)]  //[FromForm]
+        [Authorize(Roles = "Merchant, MerchantUser")]
         public async Task<ActionResult<GenericResponseDto<MerchantProfileDto>>> GetMerchantProfile()
         {
             var response = await _merchantService.GetMerchantProfileAsync();
@@ -168,7 +276,8 @@ namespace DDM.API.Web.Controllers.v1
         }
 
         [HttpGet("merchant/{id}")]
-        [Authorize(Roles = UserRoles.Merchant)]
+        // [Authorize(Roles = UserRoles.Merchant)]  //[FromForm]
+        [Authorize(Roles = "Merchant, MerchantUser")]
         public async Task<ActionResult<GenericResponseDto<MerchantListDto>>> GetMerchant(long id)
         {
             var response = await _merchantService.GetMerchantByIdAsync(id);
@@ -177,14 +286,16 @@ namespace DDM.API.Web.Controllers.v1
         }
 
         [HttpGet("dashboard/data-count")]
-        [Authorize(Roles = UserRoles.Merchant)]
-        public List<MerchantDashboardCountDto> GetDashboardFieldCount()
+        // [Authorize(Roles = UserRoles.Merchant)]  //[FromForm]
+        [Authorize(Roles = "Merchant, MerchantUser")]
+        public async Task<List<MerchantDashboardCountDto>> GetDashboardFieldCount()
         {
-            return _merchantService.GetDashboardFieldCount();
+            return await _merchantService.GetDashboardFieldCount();
         }
 
         [HttpGet("mandates/completed-payments")]
-        [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
+        // [Authorize(Roles = UserRoles.Merchant)]  //[FromForm]
+        [Authorize(Roles = "Merchant, MerchantUser")]
         public async Task<ActionResult<PagedResponse<MandateWithDetailListDto>>> GetCompletedPaymentList(int? page, int? limit)
         {
             var fullPage = page ?? 1;
@@ -196,7 +307,8 @@ namespace DDM.API.Web.Controllers.v1
         }
 
         [HttpGet("mandates/this-year-mandate")]
-        [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
+        // [Authorize(Roles = UserRoles.Merchant)]  //[FromForm]
+        [Authorize(Roles = "Merchant, MerchantUser")]
         public async Task<ActionResult<PagedResponse<MandateListDto>>> GetThisYearMandate(int? page, int? limit)
         {
             var fullPage = page ?? 1;
@@ -208,7 +320,8 @@ namespace DDM.API.Web.Controllers.v1
         }
 
         [HttpGet("mandates/latest-mandate")]
-        [Authorize(Roles = UserRoles.Merchant)]  //[FromForm] 
+        // [Authorize(Roles = UserRoles.Merchant)]  //[FromForm]
+        [Authorize(Roles = "Merchant, MerchantUser")]
         public async Task<ActionResult<PagedResponse<MandateListDto>>> GetLatestMandate(int? page, int? limit)
         {
             var fullPage = page ?? 1;
@@ -220,17 +333,19 @@ namespace DDM.API.Web.Controllers.v1
         }
 
         [HttpGet("dashboard/current-year-monthly-mandate")]
-        [Authorize(Roles = UserRoles.Merchant)]
-        public List<MerchantMonthlySumDto> GetDashboardMonthlyMandate()
+        // [Authorize(Roles = UserRoles.Merchant)]
+        [Authorize(Roles = "Merchant, MerchantUser")]
+        public async Task<List<MerchantMonthlySumDto>> GetDashboardMonthlyMandate()
         {
-            return _merchantService.GetMandateMonthlySum();
+            return await _merchantService.GetMandateMonthlySum();
         }
 
         [HttpGet("dashboard/last-five-year-mandate")]
-        [Authorize(Roles = UserRoles.Merchant)]
-        public List<MerchantYearlySumDto> GetDashboardFiveYearMandate()
+       // [Authorize(Roles = UserRoles.Merchant)]
+        [Authorize(Roles = "Merchant, MerchantUser")]
+        public async Task<List<MerchantYearlySumDto>> GetDashboardFiveYearMandate()
         {
-            return _merchantService.GetFiveYearMandate();
+            return await _merchantService.GetFiveYearMandate();
         }
     }
 }

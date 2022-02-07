@@ -14,12 +14,10 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using X.PagedList;
 using System.Globalization;
+using DDM.API.Infrastructure.Entities.Roles;
 
 namespace DDM.API.Core.Services.v1.Concrete
 {
@@ -31,23 +29,525 @@ namespace DDM.API.Core.Services.v1.Concrete
         private readonly IMapper _mapper;
         private readonly UserResolverService _userResolverService;
         private readonly UserManager<ApplicationUser> _userManager;
-        public MerchantService(DDMDbContext context, IMapper mapper, UserResolverService userResolverService, UserManager<ApplicationUser> userManager)
+        //private readonly PasswordHasher<ApplicationUser> _passwordHasher;
+        private readonly RoleManager<ApplicationRole> _roleManager;
+        //public MerchantService(DDMDbContext context, IMapper mapper, UserResolverService userResolverService, UserManager<ApplicationUser> userManager, PasswordHasher<ApplicationUser> passwordHasher, RoleManager<ApplicationRole> roleManager)
+        public MerchantService(DDMDbContext context, IMapper mapper, UserResolverService userResolverService, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
           //  _httpContextAccessor = httpContextAccessor;
             _context = context;
             _mapper = mapper;
             _userResolverService = userResolverService;
             _userManager = userManager;
-            //_roleManager = roleManager;
+            //_passwordHasher = passwordHasher;
+            _roleManager = roleManager;
+        }
+        public async Task<GenericResponseDto<MerchantUserListDto>> CreateMerchantUserAsync(MerchantUserCreateDto requestDto)
+        {
+            var userName = _userResolverService.GetUserName();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userId).Select(m => m.Id).FirstOrDefault();
+            var existingMerchant = await _context.zib_merchant_users.FirstOrDefaultAsync(e => e.User.UserName == requestDto.UserName);
+            var response = new GenericResponseDto<MerchantUserListDto>();
+
+            if (existingMerchant != null)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 400,
+                    Message = "The Username is already registered!"
+                };
+                response.StatusCode = 400;
+            }
+            else
+            {
+                var merchantUser = new ApplicationUser()
+                {
+                    MobileNumber    = requestDto.MobileNumber,
+                    UserName        = requestDto.UserName,
+                    FirstName       = requestDto.FirstName,
+                    LastName        = requestDto.LastName,
+                    Email           = requestDto.Email
+                };
+                var result = await _userManager.CreateAsync(merchantUser, requestDto.Password);
+
+                if (result.Succeeded)
+                {
+                    var merchant = _mapper.Map<MerchantUser>(requestDto);
+                    // Assign Role
+                    Task<IdentityResult> roleResult;
+                    //Check if there is any MerchantUser Role; if not created it
+                    Task<bool> hasMerchantRole = _roleManager.RoleExistsAsync(UserRoles.MerchantUser);
+                    hasMerchantRole.Wait();
+                    if (!hasMerchantRole.Result)
+                    {
+                        ApplicationRole roleCreate = new ApplicationRole();
+                        roleCreate.Name = UserRoles.MerchantUser;
+                        roleResult = _roleManager.CreateAsync(roleCreate);
+                        roleResult.Wait();
+                    }
+                    Task<IdentityResult> newUserRole = _userManager.AddToRoleAsync(merchantUser, UserRoles.MerchantUser);
+                    newUserRole.Wait();
+                    try
+                    {
+                        // var userName = _userResolverService.GetUserName();
+                        merchant.UserId = merchantUser.Id;
+                        if (loggedUserRoleName == "Merchant")
+                        {
+                            merchant.MerchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+                        }
+                        else
+                        {
+                            merchant.MerchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+                        }
+                      //  merchant.MerchantId = merchantId;
+                        merchant.IsMerchantAdmin = requestDto.IsMerchantAdmin;
+                        merchant.CreatedBy = userName;
+                        _context.zib_merchant_users.Add(merchant);
+                        await _context.SaveChangesAsync();
+
+                        response.Result = _mapper.Map<MerchantUserListDto>(merchant);
+                        response.Message = "Successfully Created Merchant User";
+                        response.StatusCode = 200;
+                    }
+                    catch (Exception ex)
+                    {
+                        response.Error = new ErrorResponseDto()
+                        {
+                            ErrorCode = 500,
+                            Message = ex.Message
+                        };
+                        response.StatusCode = 500;
+                    }
+                }
+                else
+                {
+                    var error = "";
+                    foreach (var identityError in result.Errors)
+                    {
+                        error += identityError.Description;
+                    }
+                    response.Error = new ErrorResponseDto { ErrorCode = 500, Message = "Failed to create Merchant because of the following errors: " + error };
+                }
+            }
+            return response;
+        }
+        public async Task<PagedResponse<MerchantUserListDto>> GetMerchantUserAsync(int page, int limit)
+        {
+            var response = new PagedResponse<MerchantUserListDto>();
+            var userName = _userResolverService.GetUserName();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+
+            try
+            {
+                if (page >= 1 && limit >= 1)
+                {
+                    var merchantQueryable = _context.zib_merchant_users.Include(e => e.User).Include(l => l.Merchant).AsQueryable();
+                    var pagedMerchants = await merchantQueryable.ToPagedListAsync(page, limit);
+
+                    response.Result = _mapper.Map<List<MerchantUserListDto>>(pagedMerchants.ToList());
+                    response.TotalPages = pagedMerchants.PageCount;
+                    response.Page = pagedMerchants.PageNumber;
+                    response.PerPage = pagedMerchants.PageSize;
+                }
+                else
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 400,
+                        Message = "The page number and page size must be greater than 1!"
+                    };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+
+            return response;
+        }
+        public async Task<GenericResponseDto<MerchantUserListDto>> GetMerchantUserByIdAsync(long id)
+        {
+            var response = new GenericResponseDto<MerchantUserListDto>();
+
+            var userName = _userResolverService.GetUserName();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+
+            var merchant = await _context.zib_merchant_users.Include(e => e.User).Include(l => l.Merchant)
+                                                .FirstOrDefaultAsync(e => e.Id == id);
+
+            if (merchant != null)
+            {
+                response.Result = _mapper.Map<MerchantUserListDto>(merchant);
+                response.Message = "Successfully Retrieved Merchant User";
+                response.StatusCode = 200;
+            }
+            else
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 404,
+                    Message = "Merchant User not found!"
+                };
+                response.StatusCode = 404;
+            }
+
+            return response;
+        }
+        public async Task<GenericResponseDto<MerchantUserListDto>> UpdateMerchantUserAsync(long id, MerchantUserUpdateDto requestDto)
+        {
+            var response = new GenericResponseDto<MerchantUserListDto>();
+
+            var merchantUser = await _context.zib_merchant_users.FirstOrDefaultAsync(s => s.Id == id);
+            var userId = _context.zib_merchant_users.Where(u => u.Id == id).Select(m => m.UserId).FirstOrDefault();
+            var userId1 = userId.ToString();
+            var userName = _userResolverService.GetUserName();
+
+            if (merchantUser != null)
+            {
+                try
+                {
+                    // Get the existing merchant user from the db
+                    var appUser = await _userManager.FindByIdAsync(userId1);
+                    if (appUser != null)
+                    {
+                        appUser.MobileNumber = requestDto.MobileNumber;
+                        appUser.UserName = requestDto.UserName;
+                        appUser.FirstName = requestDto.FirstName;
+                        appUser.LastName = requestDto.LastName;
+                        appUser.Email = requestDto.Email;
+                        //appUser.PasswordHash = requestDto.Password//checkUser.PasswordHash;
+                        //if (!string.IsNullOrEmpty(requestDto.Password))
+                        //{
+                        //    appUser.PasswordHash = _passwordHasher.HashPassword(appUser, requestDto.Password);
+                        //}
+                        //else
+                        //{
+                        //    response.Error = new ErrorResponseDto()
+                        //    {
+                        //        ErrorCode = 400,
+                        //        Message = "Password cannot be empty!"
+                        //    };
+                        //    response.StatusCode = 400;
+                        //}
+                    }
+                    var result = await _userManager.UpdateAsync(appUser);
+                    if (result.Succeeded)
+                    {
+                        var updatedMerchantUser = _mapper.Map(requestDto, merchantUser);
+                        updatedMerchantUser.IsMerchantAdmin = requestDto.IsMerchantAdmin;
+                        updatedMerchantUser.LastUpdatedBy = userName;
+                        _context.zib_merchant_users.Add(updatedMerchantUser);
+                        await _context.SaveChangesAsync();
+
+                        response.Result = _mapper.Map<MerchantUserListDto>(updatedMerchantUser);
+                        response.Message = "Successfully Created Merchant User";
+                        response.StatusCode = 200;
+                    }
+                    else
+                    {
+                        var error = "";
+                        foreach (var identityError in result.Errors)
+                        {
+                            error += identityError.Description;
+                        }
+                        response.Error = new ErrorResponseDto { ErrorCode = 500, Message = "Failed to update Merchant User because of the following errors: " + error };
+                    }
+                }
+                catch (Exception ex)
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 500,
+                        Message = ex.Message
+                    };
+                    response.StatusCode = 500;
+                }
+            }
+            else
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 404,
+                    Message = "Merchant User not found!"
+                };
+                response.StatusCode = 404;
+            }
+
+            return response;
+        }
+        public async Task<GenericResponseDto<MandateListDto>> CancelMandateAsync(long id, MandateCancelDto requestDto)
+        {
+            var response = new GenericResponseDto<MandateListDto>();
+            var mandate = await _context.zib_mandates.FirstOrDefaultAsync(m => m.Id == id);
+            var userName = _userResolverService.GetUserName();
+
+            if (mandate != null)
+            {
+                try
+                {
+                    mandate.IsCancelled = true;
+                    mandate.CancellationNote = requestDto.CancellationNote;
+                    mandate.CancellationBy = userName;
+                    mandate.CancellationDate = DateTime.UtcNow;
+                    await _context.SaveChangesAsync();
+
+                    response.Result = _mapper.Map<MandateListDto>(mandate);
+                    response.Message = "Successfully Cancelled Mandate";
+                    response.StatusCode = 200;
+                }
+                catch (Exception ex)
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 500,
+                        Message = ex.Message
+                    };
+                    response.StatusCode = 500;
+                }
+            }
+            else
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 404,
+                    Message = "Mandate not found!"
+                };
+                response.StatusCode = 404;
+            }
+
+            return response;
+        }
+        public async Task<GenericResponseDto<MandateListDto>> CancelMandateByCustomerRefAsync(string custAccountNo, string mandateRefNo, MandateCancelDto requestDto)
+        {
+            var response = new GenericResponseDto<MandateListDto>();
+            var mandate = await _context.zib_mandates.FirstOrDefaultAsync(m => m.DrAccountNumber == custAccountNo && m.ReferenceNumber == mandateRefNo);
+            var userName = _userResolverService.GetUserName();
+
+            if (mandate != null)
+            {
+                try
+                {
+                    mandate.IsCancelled = true;
+                    mandate.CancellationNote = requestDto.CancellationNote;
+                    mandate.CancellationBy = userName;
+                    mandate.CancellationDate = DateTime.UtcNow;
+                    await _context.SaveChangesAsync();
+
+                    response.Result = _mapper.Map<MandateListDto>(mandate);
+                    response.Message = "Successfully Cancelled Mandate";
+                    response.StatusCode = 200;
+                }
+                catch (Exception ex)
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 500,
+                        Message = ex.Message
+                    };
+                    response.StatusCode = 500;
+                }
+            }
+            else
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 404,
+                    Message = "Mandate not found!"
+                };
+                response.StatusCode = 404;
+            }
+
+            return response;
+        }
+        public async Task<PagedResponse<MandateListDto>> GetMandateCancelledAsync(int page, int limit)
+        {
+            var response = new PagedResponse<MandateListDto>();
+            var userName = _userResolverService.GetUserName();
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            try
+            {
+                if (page >= 1 && limit >= 1)
+                {
+                    var mandateQueryable = _context.zib_mandates.AsQueryable().Where(m => m.MerchantId == merchantId).Where(m => (bool)m.IsCancelled);
+                    var pagedMandates = await mandateQueryable.Include(l => l.MandateDetails)
+                                                .ThenInclude(l => l.Merchant)
+                                                .ThenInclude(e => e.User)
+                                                .ToPagedListAsync(page, limit);
+
+                    response.Result = _mapper.Map<List<MandateListDto>>(pagedMandates.ToList());
+                    response.TotalPages = pagedMandates.PageCount;
+                    response.Page = pagedMandates.PageNumber;
+                    response.PerPage = pagedMandates.PageSize;
+                }
+                else
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 400,
+                        Message = "The page number and page size must be greater than 1!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+            return response;
+        }
+        public async Task<PagedResponse<MandateListDto>> GetMandateCancelledByCustomerAsync(string custAccountNo, int page, int limit)
+        {
+            var response = new PagedResponse<MandateListDto>();
+            var userName = _userResolverService.GetUserName();
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            try
+            {
+                if (page >= 1 && limit >= 1)
+                {
+                    var mandateQueryable = _context.zib_mandates.AsQueryable().Where(m => m.MerchantId == merchantId).Where(m => m.DrAccountNumber == custAccountNo && (bool)m.IsCancelled);
+                    var pagedMandates = await mandateQueryable.Include(l => l.MandateDetails)
+                                                .ThenInclude(l => l.Merchant)
+                                                .ThenInclude(e => e.User)
+                                                .ToPagedListAsync(page, limit);
+
+                    response.Result = _mapper.Map<List<MandateListDto>>(pagedMandates.ToList());
+                    response.TotalPages = pagedMandates.PageCount;
+                    response.Page = pagedMandates.PageNumber;
+                    response.PerPage = pagedMandates.PageSize;
+                }
+                else
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 400,
+                        Message = "The page number and page size must be greater than 1!"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+            return response;
+        }
+        public async Task<GenericResponseDto<MandateListDto>> GetMandateCancelledByCustomerRefAsync(string custAccountNo, string mandateRefNo)
+        {
+            var response = new GenericResponseDto<MandateListDto>();
+            var userName = _userResolverService.GetUserName();
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            try
+            {
+                var custMandate = await _context.zib_mandates.Include(m => m.Merchant).ThenInclude(m => m.User).FirstOrDefaultAsync(m => m.MerchantId == merchantId && m.DrAccountNumber == custAccountNo && m.ReferenceNumber == mandateRefNo && (bool)m.IsCancelled);
+                if (custMandate != null)
+                {
+                    response.Result = _mapper.Map<MandateListDto>(custMandate);
+                    response.Message = "Successfully Retrieved Mandate";
+                    response.StatusCode = 200;
+                }
+                else
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        ErrorCode = 404,
+                        Message = "Mandate not found!"
+                    };
+                    response.StatusCode = 404;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+            return response;
         }
         public async Task<GenericResponseDto<MandateListDto>> CreateMerchantMandateAsync(MandateCreateDto requestDto)
         {
             var userId = _userResolverService.GetUserName();
             var userId1 = _userResolverService.GetUserName();
-            //var userId = long.Parse(userId1);
-            var merchantId = _context.zib_merchants.Where(u => u.UserName == userId).Select(m => m.Id).FirstOrDefault();
-                //var existingMerchant = await _context.zib_merchants.FirstOrDefaultAsync(e => e.User.UserName == requestDto.UserName);
-            //var response = new GenericResponseDto<AllMerchantListDto>();
+            var getUser = await _userManager.FindByNameAsync(userId);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userId).Select(m => m.Id).FirstOrDefault();
             var response = new GenericResponseDto<MandateListDto>();
 
             //var existingUser = await _context.Departments.FirstOrDefaultAsync(d => d.Id == requestDto.DepartmentId);
@@ -76,7 +576,15 @@ namespace DDM.API.Core.Services.v1.Concrete
                     var userName = _userResolverService.GetUserName();
                     mandate.RawData = transactionJsonData;
                     mandate.PaymentCount = (int)numberOfTimes;
-                    mandate.MerchantId = merchantId;
+                    // mandate.MerchantId = merchantId;
+                    if (loggedUserRoleName == "Merchant")
+                    {
+                        mandate.MerchantId = _context.zib_merchants.Where(u => u.UserName == userId).Select(m => m.Id).FirstOrDefault();
+                    }
+                    else
+                    {
+                        mandate.MerchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userId).Select(m => m.Id).FirstOrDefault();
+                    }
                     mandate.CreatedBy = userName;
                     _context.zib_mandates.Add(mandate);
                     await _context.SaveChangesAsync();
@@ -86,8 +594,6 @@ namespace DDM.API.Core.Services.v1.Concrete
                     transaction.MerchantId = mandate.MerchantId;
                     transaction.RawData = mandate.RawData;
                     transaction.CreatedBy = userName;
-                   // transaction.CreatedDate = DateTime.Now;
-
                     _context.zib_transaction_logs.Add(transaction);
                     await _context.SaveChangesAsync();
 
@@ -137,7 +643,6 @@ namespace DDM.API.Core.Services.v1.Concrete
                         mandateDetail.EndDate           = mandate.EndDate;
                         mandateDetail.DueDate           = dueDate;
                         mandateDetail.CreatedBy         = userName;
-                        //  mandateDetail.CreatedDate       = DateTime.Now;
                         _context.zib_mandate_details.Add(mandateDetail);
                         await _context.SaveChangesAsync();
                     }
@@ -169,7 +674,20 @@ namespace DDM.API.Core.Services.v1.Concrete
         {
             var response = new PagedResponse<MandateListDto>();
             var userName = _userResolverService.GetUserName();
-            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+           // var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
             try
             {
                 if (page >= 1 && limit >= 1)
@@ -208,8 +726,20 @@ namespace DDM.API.Core.Services.v1.Concrete
         {
             var response = new PagedResponse<MandateDetailListDto>();
             var userName = _userResolverService.GetUserName();
-           // var userId = long.Parse(userId1);
-            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+          //  var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+
             try
             {
                 if (page >= 1 && limit >= 1)
@@ -245,7 +775,20 @@ namespace DDM.API.Core.Services.v1.Concrete
         {
             var response = new PagedResponse<MandateWithDetailListDto>();
             var userName = _userResolverService.GetUserName();
-            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => (int?)m.Id).FirstOrDefault();
+           // var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => (int?)m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
             try
             {
                 if (page >= 1 && limit >= 1)
@@ -257,8 +800,6 @@ namespace DDM.API.Core.Services.v1.Concrete
                                                 .ThenInclude(e => e.User)
                                                 .ToPagedListAsync(page, limit);
                   //  var mandateList = pagedMandates.ToList();
-                  //  var stringRes = JsonConvert.SerializeObject(mandateList);
-
                   //  response.Result = _mapper.Map<List<MandateWithDetailListDto>>(mandateList);
                     response.Result = _mapper.Map<List<MandateWithDetailListDto>>(pagedMandates.ToList());
                     response.TotalPages = pagedMandates.PageCount;
@@ -288,7 +829,20 @@ namespace DDM.API.Core.Services.v1.Concrete
         {
             var response = new PagedResponse<MandateListDto>();
             var userName = _userResolverService.GetUserName();
-            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
             try
             {
                 if (page >= 1 && limit >= 1)
@@ -327,7 +881,20 @@ namespace DDM.API.Core.Services.v1.Concrete
         {
             var response = new PagedResponse<MandateListDto>();
             var userName = _userResolverService.GetUserName();
-            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
             try
             {
                 if (page >= 1 && limit >= 1)
@@ -366,7 +933,19 @@ namespace DDM.API.Core.Services.v1.Concrete
         {
             var response = new GenericResponseDto<MandateListDto>();
             var userName = _userResolverService.GetUserName();
-            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
             try
             {
                 var custMandate = await _context.zib_mandates.Include(m => m.Merchant).ThenInclude(m => m.User).FirstOrDefaultAsync(m => m.MerchantId == merchantId && m.DrAccountNumber == custAccountNo && m.ReferenceNumber == mandateRefNo && (bool)m.IsApproved);
@@ -400,8 +979,19 @@ namespace DDM.API.Core.Services.v1.Concrete
         {
             var response = new PagedResponse<MandateDetailListDto>();
             var userName = _userResolverService.GetUserName();
-            // var userId = long.Parse(userId1);
-            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
             try
             {
                 if (page >= 1 && limit >= 1)
@@ -439,7 +1029,19 @@ namespace DDM.API.Core.Services.v1.Concrete
         {
             var response = new PagedResponse<MandateDetailListDto>();
             var userName = _userResolverService.GetUserName();
-            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
             try
             {
                 if (page >= 1 && limit >= 1)
@@ -477,7 +1079,19 @@ namespace DDM.API.Core.Services.v1.Concrete
         {
             var response = new GenericResponseDto<MandateDetailListDto>();
             var userName = _userResolverService.GetUserName();
-            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
             try
             {
                 var custMandate = await _context.zib_mandate_details.Include(m => m.Merchant).ThenInclude(m => m.User).FirstOrDefaultAsync(m => m.MerchantId == merchantId && m.DrAccountNumber == custAccountNo && m.ReferenceNumber == mandateRefNo && (byte)m.MandateStatus == 2);
@@ -511,7 +1125,19 @@ namespace DDM.API.Core.Services.v1.Concrete
         {
             var response = new PagedResponse<MandateListDto>();
             var userName = _userResolverService.GetUserName();
-            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
             try
             {
                 if (page >= 1 && limit >= 1)
@@ -546,7 +1172,6 @@ namespace DDM.API.Core.Services.v1.Concrete
         public async Task<GenericResponseDto<MandateListDto>> GetMandateByIdAsync(long id)
         {
             var response = new GenericResponseDto<MandateListDto>();
-
             var mandate = await _context.zib_mandates.Include(l => l.MandateDetails)
                                                 .ThenInclude(l => l.Merchant)
                                                 .ThenInclude(e => e.User)
@@ -571,10 +1196,20 @@ namespace DDM.API.Core.Services.v1.Concrete
         public async Task<GenericResponseDto<MerchantProfileDto>> GetMerchantProfileAsync()
         {
             var response = new GenericResponseDto<MerchantProfileDto>();
-            //var userId1 = _userResolverService.GetUserId();
-            //var userId = long.Parse(userId1);
             var userName = _userResolverService.GetUserName();
-            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
 
             var merchantProfile = await _context.zib_merchants.Include(e => e.User)
                                                 .FirstOrDefaultAsync(e => e.Id == merchantId);
@@ -600,7 +1235,6 @@ namespace DDM.API.Core.Services.v1.Concrete
         public async Task<GenericResponseDto<MerchantListDto>> GetMerchantByIdAsync(long id)
         {
             var response = new GenericResponseDto<MerchantListDto>();
-
             var merchant = await _context.zib_merchants.Include(e => e.User)
                                                 .FirstOrDefaultAsync(e => e.Id == id);
 
@@ -622,14 +1256,26 @@ namespace DDM.API.Core.Services.v1.Concrete
 
             return response;
         }
-        public List<MerchantDashboardCountDto> GetDashboardFieldCount()
+        public async Task<List<MerchantDashboardCountDto>> GetDashboardFieldCount()
         {
             MerchantDashboardCountDto data = new MerchantDashboardCountDto();
             DateTime current = DateTime.Now;
             DateTime currentYear = DateTime.Parse($"{current.Year}/01/01");
 
             var userName = _userResolverService.GetUserName();
-            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
 
             data.AllMandateCount = _context.zib_mandates.Where(m => m.MerchantId == merchantId).Select(c => c.Id).Distinct().Count();
             data.CompletedPaymentCount = _context.zib_mandate_details.Where(m => m.MerchantId == merchantId).Where(m => (byte)m.MandateStatus == 2).Select(c => c.MandateId).Distinct().Count();
@@ -642,12 +1288,23 @@ namespace DDM.API.Core.Services.v1.Concrete
 
             return dataCount;
         }
-
         public async Task<PagedResponse<MandateWithDetailListDto>> GetCompletedPaymentListAsync(int page, int limit)
         {
             var response = new PagedResponse<MandateWithDetailListDto>();
             var userName = _userResolverService.GetUserName();
-            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => (int?)m.Id).FirstOrDefault();
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => (int?)m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
             try
             {
                 if (page >= 1 && limit >= 1)
@@ -688,7 +1345,19 @@ namespace DDM.API.Core.Services.v1.Concrete
             DateTime current = DateTime.Now;
             DateTime currentYear = DateTime.Parse($"{current.Year}/01/01");
             var userName = _userResolverService.GetUserName();
-            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
             try
             {
                 if (page >= 1 && limit >= 1)
@@ -727,7 +1396,19 @@ namespace DDM.API.Core.Services.v1.Concrete
         {
             var response = new PagedResponse<MandateListDto>();
             var userName = _userResolverService.GetUserName();
-            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
             try
             {
                 if (page >= 1 && limit >= 1)
@@ -762,14 +1443,24 @@ namespace DDM.API.Core.Services.v1.Concrete
             }
             return response;
         }
-
-        public List<MerchantMonthlySumDto> GetMandateMonthlySum()
+        public async Task<List<MerchantMonthlySumDto>> GetMandateMonthlySum()
         {
             DateTime current = DateTime.Now;
             DateTime currentYear = DateTime.Parse($"{current.Year}/01/01");
             var userName = _userResolverService.GetUserName();
-            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
-
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
             var monthlyMandate = _context.zib_mandates.Where(m => m.CreatedDate >= currentYear).Where(m => m.MerchantId == merchantId)
                 .GroupBy(o => new
                 {
@@ -784,11 +1475,22 @@ namespace DDM.API.Core.Services.v1.Concrete
                 .ToList();
             return monthlyMandate;
         }
-
-        public List<MerchantYearlySumDto> GetFiveYearMandate()
+        public async Task<List<MerchantYearlySumDto>> GetFiveYearMandate()
         {
             var userName = _userResolverService.GetUserName();
-            var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            //var merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            long merchantId;
+            if (loggedUserRoleName == "Merchant")
+            {
+                merchantId = _context.zib_merchants.Where(u => u.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
+            else
+            {
+                merchantId = _context.zib_merchant_users.Where(u => u.User.UserName == userName).Select(m => m.Id).FirstOrDefault();
+            }
             var yearlyMandate = _context.zib_mandates.Where(m => m.CreatedDate > DateTime.Now.AddYears(-5)).Where(m => m.MerchantId == merchantId)
                 .GroupBy(o => o.CreatedDate.Value.Year)
                 .Select(u => new MerchantYearlySumDto
@@ -803,7 +1505,6 @@ namespace DDM.API.Core.Services.v1.Concrete
 
             //apply percentage to each element
             yearlyMandate.ForEach(s => s.ItemPercent = Math.Round(((decimal)100.0 * (s.ItemTotal / tot)), 2));
-
             return yearlyMandate;
         }
     }

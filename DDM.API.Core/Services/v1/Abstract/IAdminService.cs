@@ -1,6 +1,7 @@
 ﻿using DDM.API.Core.DTOs.v1.Admin.Request;
 using DDM.API.Core.DTOs.v1.Admin.Response;
 using DDM.API.Core.DTOs.v1.Merchant.Request;
+using DDM.API.Infrastructure.Data.Identiity;
 //using DDM.API.Core.DTOs.v1.Merchant.Response;
 using DDM.API.Infrastructure.Entities.DTOs;
 using System;
@@ -13,11 +14,19 @@ namespace DDM.API.Core.Services.v1.Abstract
 {
     public interface IAdminService
     {
+        //Task<IEnumerable<ApplicationUser>> GetAllActiveUsers();
+        //Task<bool> Lock(long id);
+        //Task<bool> Unlock(long id);
         Task<GenericResponseDto<AdminUserDto>> CreateAdminUserAsync(AdminCreateDto requestDto);
         Task<GenericResponseDto<AllMerchantListDto>> CreateMerchantAsync(MerchantCreateDto requestDto);
         Task<PagedResponse<AllMerchantListDto>> GetMerchantAsync(int page, int limit);
         Task<GenericResponseDto<AllMerchantListDto>> GetMerchantByIdAsync(long id);
+        Task<PagedResponse<AllMerchantListDto>> GetMerchantWithUserAsync(int page, int limit);
+        Task<GenericResponseDto<AllMerchantListDto>> GetMerchantWithUserByIdAsync(long id);
         Task<PagedResponse<AllMandateWithDetailListDto>> GetMandateWithDetailListAsync(int page, int limit);
+        Task<PagedResponse<AllMandateListDto>> GetMandateCancelledAsync(int page, int limit);
+        Task<PagedResponse<AllMandateListDto>> GetMandateCancelledByCustomerAsync(string custAccountNo, int page, int limit);
+        Task<GenericResponseDto<AllMandateListDto>> GetMandateCancelledByCustomerRefAsync(string custAccountNo, string mandateRefNo);
         Task<PagedResponse<AllMandateListDto>> GetMandateApprovedAsync(int page, int limit);
         Task<PagedResponse<AllMandateListDto>> GetMandateApprovedByCustomerAsync(string custAccountNo, int page, int limit);
         Task<GenericResponseDto<AllMandateListDto>> GetMandateApprovedByCustomerRefAsync(string custAccountNo, string mandateRefNo);

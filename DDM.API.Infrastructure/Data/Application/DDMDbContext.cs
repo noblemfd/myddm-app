@@ -33,7 +33,7 @@ namespace DDM.API.Infrastructure.Data.Application
         public DbSet<TokenLog> zib_logs { get; set; }
         public DbSet<RefreshToken> zib_refresh_tokens { get; set; }
         public DbSet<AuditTrail> zib_audit_trails { get; set; }
-     //   public DbSet<ApplicationUser> ApplicationUser { get; set; }
+        //public DbSet<ApplicationUser> ApplicationUser { get; set; }
         public DbSet<ApplicationRole> ApplicationRole { get; set; }
         public DbSet<ApplicationUserRole> ApplicationUserRole { get; set; }
 

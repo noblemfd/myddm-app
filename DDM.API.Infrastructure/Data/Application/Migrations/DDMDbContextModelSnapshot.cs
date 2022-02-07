@@ -251,7 +251,7 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<decimal?>("Amount")
+                    b.Property<decimal>("Amount")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
@@ -259,6 +259,12 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                         .HasColumnType("varchar(200)");
 
                     b.Property<DateTime?>("ApprovedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CancellationBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CancellationDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CancellationNote")
@@ -299,9 +305,6 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
 
                     b.Property<DateTime?>("LastUpdatedDate")
                         .HasColumnType("datetime");
-
-                    b.Property<DateTime?>("MandateCancellationDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<long>("MerchantId")
                         .HasColumnType("bigint");
@@ -511,6 +514,51 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("zib_merchants");
+                });
+
+            modelBuilder.Entity("DDM.API.Infrastructure.Entities.Models.MerchantUser", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<bool?>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool?>("IsMerchantAdmin")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("LastUpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastUpdatedDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<long>("MerchantId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("MerchantId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("zib_merchant_users");
                 });
 
             modelBuilder.Entity("DDM.API.Infrastructure.Entities.Models.NotificationLog", b =>
@@ -840,6 +888,25 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("DDM.API.Infrastructure.Entities.Models.MerchantUser", b =>
+                {
+                    b.HasOne("DDM.API.Infrastructure.Entities.Models.Merchant", "Merchant")
+                        .WithMany("MerchantUsers")
+                        .HasForeignKey("MerchantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DDM.API.Infrastructure.Data.Identiity.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Merchant");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("DDM.API.Infrastructure.Entities.Models.StaffMember", b =>
                 {
                     b.HasOne("DDM.API.Infrastructure.Data.Identiity.ApplicationUser", "User")
@@ -931,6 +998,8 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                     b.Navigation("MandateDetails");
 
                     b.Navigation("Mandates");
+
+                    b.Navigation("MerchantUsers");
                 });
 #pragma warning restore 612, 618
         }

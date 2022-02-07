@@ -28,5 +28,6 @@ namespace DDM.API.Core.DTOs.v1.Admin.Response
         public decimal? MaxChargeValue { get; set; }
         public DateTime? CreatedDate { get; set; }
         public AllUserListDto User { get; set; }
+        public ICollection<AllMerchantUserListDto> MerchantUsers { get; set; }
     }
 }

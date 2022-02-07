@@ -52,6 +52,27 @@ namespace DDM.API.Web.Controllers.v1
             return new JsonResult(response);
         }
 
+        [HttpGet("merchants/merchants-with-users")]
+        [Authorize(Roles = UserRoles.Admin)]  //[FromForm] 
+        public async Task<ActionResult<PagedResponse<AllMerchantListDto>>> GetAllMerchantWithUsers(int? page, int? limit)
+        {
+            var fullPage = page ?? 1;
+            var pageSize = limit ?? 10;
+
+            var response = await _adminService.GetMerchantWithUserAsync(fullPage, pageSize);
+            Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("merchant/merchant-with-user/{id}")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<ActionResult<GenericResponseDto<AllMerchantListDto>>> GetMerchantWithUser(long id)
+        {
+            var response = await _adminService.GetMerchantWithUserByIdAsync(id);
+            Response.StatusCode = response.StatusCode ?? StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
         [HttpGet("mandates/mandate-with-details")]
         [Authorize(Roles = UserRoles.Admin)]  //[FromForm] 
         public async Task<ActionResult<PagedResponse<AllMandateWithDetailListDto>>> GetMandateWithDetails(int? page, int? limit)
@@ -61,6 +82,39 @@ namespace DDM.API.Web.Controllers.v1
 
             var response = await _adminService.GetMandateWithDetailListAsync(fullPage, pageSize);
             Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("mandates/cancelled-mandates")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<ActionResult<PagedResponse<AllMandateListDto>>> GetMandateCancelled(int? page, int? limit)
+        {
+            var fullPage = page ?? 1;
+            var pageSize = limit ?? 10;
+
+            var response = await _adminService.GetMandateCancelledAsync(fullPage, pageSize);
+            Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("mandates/cancelled-mandates-by-acctno/{custAccountNo}")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<ActionResult<PagedResponse<AllMandateListDto>>> GetMandateCancelledByCustomer(string custAccountNo, int? page, int? limit)
+        {
+            var fullPage = page ?? 1;
+            var pageSize = limit ?? 10;
+
+            var response = await _adminService.GetMandateCancelledByCustomerAsync(custAccountNo, fullPage, pageSize);
+            Response.StatusCode = response.Error != null ? response.Error.ErrorCode : StatusCodes.Status200OK;
+            return new JsonResult(response);
+        }
+
+        [HttpGet("mandates/cancelled-mandates-by-acctno-refno/{custAccountNo}/{mandateRefNo}")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<ActionResult<GenericResponseDto<AllMandateListDto>>> GetMandateCancelledByCustomerRef(string custAccountNo, string mandateRefNo)
+        {
+            var response = await _adminService.GetMandateCancelledByCustomerRefAsync(custAccountNo, mandateRefNo);
+            Response.StatusCode = response.StatusCode ?? StatusCodes.Status200OK;
             return new JsonResult(response);
         }
 

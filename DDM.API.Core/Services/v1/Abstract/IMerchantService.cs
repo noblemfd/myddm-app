@@ -11,8 +11,18 @@ namespace DDM.API.Core.Services.v1.Abstract
 {
     public interface IMerchantService
     {
+        Task<GenericResponseDto<MerchantUserListDto>> CreateMerchantUserAsync(MerchantUserCreateDto requestDto);
         Task<GenericResponseDto<MandateListDto>> CreateMerchantMandateAsync(MandateCreateDto requestDto);
-        //Task<GenericResponseDto<bool>> CancelMandateAsync(long id);
+        Task<PagedResponse<MerchantUserListDto>> GetMerchantUserAsync(int page, int limit);
+        Task<GenericResponseDto<MerchantUserListDto>> GetMerchantUserByIdAsync(long id);
+        Task<GenericResponseDto<MerchantUserListDto>> UpdateMerchantUserAsync(long id, MerchantUserUpdateDto requestDto);
+        //Task<GenericResponseDto<bool>> DeleteMerchantUserAsync(long id);
+        Task<GenericResponseDto<MandateListDto>> CancelMandateAsync(long id, MandateCancelDto requestDto);
+        Task<GenericResponseDto<MandateListDto>> CancelMandateByCustomerRefAsync(string custAccountNo, string mandateRefNo, MandateCancelDto requestDto);
+        //Task<GenericResponseDto<MandateListDto>> RestoreMandateAsync(long id);
+        Task<PagedResponse<MandateListDto>> GetMandateCancelledAsync(int page, int limit);
+        Task<PagedResponse<MandateListDto>> GetMandateCancelledByCustomerAsync(string custAccountNo, int page, int limit);
+        Task<GenericResponseDto<MandateListDto>> GetMandateCancelledByCustomerRefAsync(string custAccountNo, string mandateRefNo);
         Task<PagedResponse<MandateListDto>> GetMandateAsync(int page, int limit);
         Task<PagedResponse<MandateDetailListDto>> GetMandateDetailListAsync(long mandateId, int page, int limit);
         Task<PagedResponse<MandateWithDetailListDto>> GetMandateWithDetailListAsync(int page, int limit);
@@ -26,11 +36,11 @@ namespace DDM.API.Core.Services.v1.Abstract
         Task<GenericResponseDto<MandateListDto>> GetMandateByIdAsync(long id);
         Task<GenericResponseDto<MerchantProfileDto>> GetMerchantProfileAsync();
         Task<GenericResponseDto<MerchantListDto>> GetMerchantByIdAsync(long id);
-        List<MerchantDashboardCountDto> GetDashboardFieldCount();
+        Task<List<MerchantDashboardCountDto>> GetDashboardFieldCount();
         Task<PagedResponse<MandateWithDetailListDto>> GetCompletedPaymentListAsync(int page, int limit);
         Task<PagedResponse<MandateListDto>> GetThisYearMandateAsync(int page, int limit);
         Task<PagedResponse<MandateListDto>> GetLatestMandateAsync(int page, int limit);
-        List<MerchantMonthlySumDto> GetMandateMonthlySum();
-        List<MerchantYearlySumDto> GetFiveYearMandate();
+        Task<List<MerchantMonthlySumDto>> GetMandateMonthlySum();
+        Task<List<MerchantYearlySumDto>> GetFiveYearMandate();
     }
 }

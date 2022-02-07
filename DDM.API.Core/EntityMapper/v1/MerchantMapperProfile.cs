@@ -19,7 +19,13 @@ namespace DDM.API.Core.ProfileMapping.v1
                 //.ForMember(u => u.PasswordHash, options => options.Ignore())
                 .ForMember(e => e.User, options => options.Ignore()).ReverseMap();
 
+            CreateMap<MerchantUserUpdateDto, MerchantUser>()
+                //.ForMember(u => u.PasswordHash, options => options.Ignore())
+                .ForMember(e => e.User, options => options.Ignore()).ReverseMap();
+
             CreateMap<MandateCreateDto, Mandate>().ReverseMap();
+
+            CreateMap<MandateCancelDto, Mandate>().ReverseMap();
 
             CreateMap<Merchant, MerchantProfileDto>()
                 .ForMember(e => e.UserName, options => options.MapFrom(e => e.User != null ? e.User.UserName : null))
@@ -34,6 +40,7 @@ namespace DDM.API.Core.ProfileMapping.v1
             CreateMap<MandateDetail, MandateDetailListDto>().ReverseMap();
 
             CreateMap<Merchant, MerchantListDto>().ReverseMap();
+            CreateMap<MerchantUser, AllMerchantUserListDto>().ReverseMap();
         }
     }
 }
