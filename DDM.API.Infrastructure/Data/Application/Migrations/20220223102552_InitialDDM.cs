@@ -328,7 +328,7 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                     MerchantId = table.Column<long>(type: "bigint", nullable: false),
                     ReferenceNumber = table.Column<string>(type: "varchar(200)", nullable: true),
                     DrAccountNumber = table.Column<string>(type: "varchar(50)", nullable: true),
-                    DueDate = table.Column<DateTime>(type: "date", nullable: false),
+                    DueDate = table.Column<DateTime>(type: "date", nullable: true),
                     StartDate = table.Column<DateTime>(type: "date", nullable: false),
                     EndDate = table.Column<DateTime>(type: "date", nullable: false),
                     RawData = table.Column<string>(type: "nvarchar(max)", nullable: true),

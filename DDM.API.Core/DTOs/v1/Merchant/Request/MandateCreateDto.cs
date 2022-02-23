@@ -41,6 +41,12 @@ namespace DDM.API.Core.DTOs.v1.Merchant.Request
         [JsonProperty(PropertyName = "EndDate")]
         public DateTime EndDate { get; set; }
 
+        //[DataType(DataType.Date)]
+        //[Display(Name = "Debit Date/Due Date")]
+        //[DateGreaterThanAttribute(otherPropertyName = "StartDate", ErrorMessage = "Debit Date must be greater than Start Date")]
+        //[JsonProperty(PropertyName = "DueDate")]
+        //public DateTime? DueDate { get; set; }
+
         [Range(1,4)]
         [Display(Name = "Payment Frequency")]
         [Required(ErrorMessage = "Payment Frequency is Required")]
@@ -51,6 +57,7 @@ namespace DDM.API.Core.DTOs.v1.Merchant.Request
         [DataType(DataType.Currency)]
         [Required(ErrorMessage = "Amount is Required")]
         [Column(TypeName = "decimal(18,2)")]
+        [Range(1000, 99999999999999999999999999999999.99, ErrorMessage = "Please enter a value greater than {1000}")]
         [JsonProperty(PropertyName = "Amount")]
         public decimal Amount { get; set; }
     }

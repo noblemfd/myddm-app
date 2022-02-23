@@ -20,7 +20,7 @@ namespace DDM.API.Infrastructure.Entities.Models
 
         [Column(TypeName = "varchar(50)")]
         public string DrAccountNumber { get; set; }
-        public DateTime DueDate { get; set; }
+        public DateTime? DueDate { get; set; } = null;
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string RawData { get; set; }

@@ -71,6 +71,7 @@ namespace DDM.API.Web
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider, IApiVersionDescriptionProvider provider, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
             app.UseMiddleware<ExceptionMiddleware>();
+            //app.UseDeveloperExceptionPage();
             app.UseStatusCodePagesWithReExecute("/errors/{0}");
             #region Swagger
             // Enable middleware to serve generated Swagger as a JSON endpoint.

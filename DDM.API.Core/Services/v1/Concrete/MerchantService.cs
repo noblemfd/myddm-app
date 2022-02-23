@@ -649,16 +649,16 @@ namespace DDM.API.Core.Services.v1.Concrete
                     response.StatusCode = 201;
                     response.Message = "Successfully Created Mandate and Schedules";
                     response.Result = _mapper.Map<MandateListDto>(mandate);
-                }
-                catch (Exception ex)
-                {
-                    response.Error = new ErrorResponseDto()
-                    {
-                        ErrorCode = 500,
-                        Message = ex.Message
-                    };
-                }
             }
+                catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+        }
             else
             {
                 response.Error = new ErrorResponseDto()

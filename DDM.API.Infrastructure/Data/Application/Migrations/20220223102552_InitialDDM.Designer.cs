@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DDM.API.Infrastructure.Data.Application.Migrations
 {
     [DbContext(typeof(DDMDbContext))]
-    [Migration("20220205225625_InitialDDM")]
+    [Migration("20220223102552_InitialDDM")]
     partial class InitialDDM
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -281,7 +281,7 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                     b.Property<string>("DrAccountNumber")
                         .HasColumnType("varchar(50)");
 
-                    b.Property<DateTime>("DueDate")
+                    b.Property<DateTime?>("DueDate")
                         .HasColumnType("date");
 
                     b.Property<DateTime>("EndDate")

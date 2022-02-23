@@ -67,7 +67,8 @@ namespace DDM.API.Web.Helpers.Extensions
                     foreach (var description in provider.ApiVersionDescriptions)
                     {
                      //   options.SwaggerEndpoint(virDir + "/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
-                        options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+                        //options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+                        options.SwaggerEndpoint($"../swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
                     }
                 });
 

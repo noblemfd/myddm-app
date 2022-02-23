@@ -962,6 +962,33 @@ namespace DDM.API.Core.Services.v1.Concrete
                 .ToList();
             return monthlyMandate;
         }
+        ////public List<AdminMonthlySumDto> GetMandateMonthlySum()
+        ////{
+        ////    DateTime current = DateTime.Now;
+        ////    DateTime currentYear = DateTime.Parse($"{current.Year}/01/01");
+
+        ////    var monthlyMandate = _context.zib_mandates.Where(m => m.CreatedDate >= currentYear)
+        ////        .GroupBy(o => new
+        ////        {
+        ////            Month = o.CreatedDate.Value.Month
+        ////        })
+        ////        .Select(u => new AdminMonthlySumDto
+        ////        {
+        ////            ItemSum = u.Sum(x => x.Amount),
+        ////            Month = u.Key.Month,
+        ////            MonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(u.Key.Month)
+        ////        })
+        ////        .ToList();
+        ////    var labels = monthlyMandate.Select(x=>x.MonthName).ToArray();
+        ////    var values = monthlyMandate.Select(x => x.ItemSum).ToArray();
+        ////    var max = values[0];
+        ////    List<AdminMonthlySumDto> list1 = new List<AdminMonthlySumDto>();
+        ////    list1.Add(labels);
+        ////    list1.Add(values);
+        ////    list1.Add(max);
+        ////    return list1;
+        ////    //return monthlyMandate;
+        ////}
 
         public List<AdminYearlySumDto> GetFiveYearMandate()
         {

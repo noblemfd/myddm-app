@@ -50,7 +50,7 @@ namespace DDM.API.Core.Services.v1.Concrete
         {
             //var httpContext = new HttpContextAccessor();
             var user = await _userManager.FindByNameAsync(request.UserName);
-            var role = await _userManager.GetRolesAsync(user);
+            //var role = await _userManager.GetRolesAsync(user);
 
             var response = new GenericResponseDto<object>();
 

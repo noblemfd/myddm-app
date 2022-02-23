@@ -279,7 +279,7 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                     b.Property<string>("DrAccountNumber")
                         .HasColumnType("varchar(50)");
 
-                    b.Property<DateTime>("DueDate")
+                    b.Property<DateTime?>("DueDate")
                         .HasColumnType("date");
 
                     b.Property<DateTime>("EndDate")
