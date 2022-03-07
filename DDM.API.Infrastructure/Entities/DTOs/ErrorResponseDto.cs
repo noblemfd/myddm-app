@@ -8,6 +8,7 @@ namespace DDM.API.Infrastructure.Entities.DTOs
 {
     public class ErrorResponseDto
     {
+        public bool? Success { get; set; }
         public int ErrorCode { get; set; }
         public string Message { get; set; }
     }

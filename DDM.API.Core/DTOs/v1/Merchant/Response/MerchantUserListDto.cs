@@ -9,6 +9,8 @@ namespace DDM.API.Core.DTOs.v1.Merchant.Response
     public class MerchantUserListDto
     {
         public long? Id { get; set; }
+        public long MerchantId { get; set; }
+        public long UserId { get; set; }
         public bool? IsMerchantAdmin { get; set; }
         public UserListDto User { get; set; }
         public MerchantListDto Merchant { get; set; }

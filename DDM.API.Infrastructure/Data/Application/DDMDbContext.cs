@@ -26,7 +26,7 @@ namespace DDM.API.Infrastructure.Data.Application
         public DbSet<Mandate> zib_mandates { get; set; }
         public DbSet<MandateDetail> zib_mandate_details { get; set; }
         public DbSet<Merchant> zib_merchants { get; set; }
-        public DbSet<StaffMember> zib_staff_members { get; set; }
+        public DbSet<BankUser> zib_bank_users { get; set; }
         public DbSet<MerchantUser> zib_merchant_users { get; set; }
         public DbSet<NotificationLog> zib_notification_logs { get; set; }
         public DbSet<TransactionLog> zib_transaction_logs { get; set; }
@@ -144,7 +144,7 @@ namespace DDM.API.Infrastructure.Data.Application
                 entity.Property(t => t.CreatedDate).HasColumnType("datetime");
                 entity.Property(t => t.LastUpdatedDate).HasColumnType("datetime");
             });
-            builder.Entity<StaffMember>(entity =>
+            builder.Entity<BankUser>(entity =>
             {
                 entity.Property(m => m.Id).ValueGeneratedOnAdd();
                 entity.Property(m => m.IsAdmin).HasDefaultValue(false);

@@ -40,7 +40,11 @@ namespace DDM.API.Core.Services.v1.Abstract
         Task<GenericResponseDto<AllMandateListDto>> GetMandateByIdAsync(long id);
         Task<PagedResponse<AllMandateDetailListDto>> GetAllMandateDetailListAsync(long mandateId, int page, int limit);
         //Task<PagedResponse<AllMandateWithDetailListDto>> GetAllMandateWithDetailListAsync(long mandateId, int page, int limit);
-        //Task<PagedResponse<AllStaffListDto>> GetAllStaffAsync(int page, int limit);
+        Task<GenericResponseDto<AllBankUserListDto>> CreateBankUserAsync(BankUserCreateDto requestDto);
+        Task<PagedResponse<AllBankUserListDto>> GetBankUserAsync(int page, int limit);
+        Task<GenericResponseDto<AllBankUserListDto>> GetBankUserByIdAsync(long id);
+        Task<GenericResponseDto<AllBankUserListDto>> UpdateBankUserAsync(long id, BankUserUpdateDto requestDto);
+        Task<GenericResponseDto<AllBankUserListDto>> DeleteBankUserAsync(long id);
         //Task<PagedResponse<AllUserListDto>> GetAllUserAsync(int page, int limit);
         //AdminDashboardDto GetAdminDashboard(string userName);
         List<AdminDashboardCountDto> GetDashboardFieldCount();

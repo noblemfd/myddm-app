@@ -202,6 +202,34 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "zib_bank_users",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<long>(type: "bigint", nullable: true),
+                    IsAdmin = table.Column<bool>(type: "bit", nullable: true, defaultValue: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BankBranch = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HeadOffice = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastUpdatedDate = table.Column<DateTime>(type: "datetime", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValue: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_zib_bank_users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_zib_bank_users_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "zib_logs",
                 columns: table => new
                 {
@@ -291,32 +319,6 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "zib_staff_members",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<long>(type: "bigint", nullable: true),
-                    IsAdmin = table.Column<bool>(type: "bit", nullable: true, defaultValue: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastUpdatedDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValue: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_zib_staff_members", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_zib_staff_members_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -529,6 +531,11 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_zib_bank_users_UserId",
+                table: "zib_bank_users",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_zib_logs_UserId",
                 table: "zib_logs",
                 column: "UserId");
@@ -584,11 +591,6 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_zib_staff_members_UserId",
-                table: "zib_staff_members",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_zib_transaction_logs_MandateId",
                 table: "zib_transaction_logs",
                 column: "MandateId",
@@ -622,6 +624,9 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                 name: "zib_audit_trails");
 
             migrationBuilder.DropTable(
+                name: "zib_bank_users");
+
+            migrationBuilder.DropTable(
                 name: "zib_logs");
 
             migrationBuilder.DropTable(
@@ -635,9 +640,6 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
 
             migrationBuilder.DropTable(
                 name: "zib_refresh_tokens");
-
-            migrationBuilder.DropTable(
-                name: "zib_staff_members");
 
             migrationBuilder.DropTable(
                 name: "zib_transaction_logs");

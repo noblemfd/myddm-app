@@ -244,6 +244,54 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                     b.ToTable("zib_refresh_tokens");
                 });
 
+            modelBuilder.Entity("DDM.API.Infrastructure.Entities.Models.BankUser", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("BankBranch")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HeadOffice")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("IsAdmin")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool?>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("LastUpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastUpdatedDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("zib_bank_users");
+                });
+
             modelBuilder.Entity("DDM.API.Infrastructure.Entities.Models.Mandate", b =>
                 {
                     b.Property<long>("Id")
@@ -611,48 +659,6 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                     b.ToTable("zib_notification_logs");
                 });
 
-            modelBuilder.Entity("DDM.API.Infrastructure.Entities.Models.StaffMember", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("IsAdmin")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<bool?>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("LastUpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastUpdatedDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<long?>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("zib_staff_members");
-                });
-
             modelBuilder.Entity("DDM.API.Infrastructure.Entities.Models.TokenLog", b =>
                 {
                     b.Property<long>("Id")
@@ -853,6 +859,15 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("DDM.API.Infrastructure.Entities.Models.BankUser", b =>
+                {
+                    b.HasOne("DDM.API.Infrastructure.Data.Identiity.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("DDM.API.Infrastructure.Entities.Models.Mandate", b =>
                 {
                     b.HasOne("DDM.API.Infrastructure.Entities.Models.Merchant", "Merchant")
@@ -903,15 +918,6 @@ namespace DDM.API.Infrastructure.Data.Application.Migrations
                         .IsRequired();
 
                     b.Navigation("Merchant");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("DDM.API.Infrastructure.Entities.Models.StaffMember", b =>
-                {
-                    b.HasOne("DDM.API.Infrastructure.Data.Identiity.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });

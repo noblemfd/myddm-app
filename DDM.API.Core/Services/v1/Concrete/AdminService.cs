@@ -83,20 +83,21 @@ namespace DDM.API.Core.Services.v1.Concrete
                 else
                 {
                     response.StatusCode = 200;
+                    response.Success = true;
                     response.Message = "Successfully Created Admmin User";
                     response.Result = _mapper.Map<AdminUserDto>(user);
                 }
             }
             else
             {
-                response.Error = new ErrorResponseDto { ErrorCode = 400, Message = "This Username is already registered!" };
+                response.Error = new ErrorResponseDto { Success = false, ErrorCode = 400, Message = "This Username is already registered!" };
                 response.StatusCode = 400;
             }
             return response;
         }
         public async Task<GenericResponseDto<AllMerchantListDto>> CreateMerchantAsync(MerchantCreateDto requestDto)
         {
-            var existingMerchant = await _context.zib_merchants.FirstOrDefaultAsync(e => e.User.UserName == requestDto.UserName || e.MerchantName == requestDto.MerchantName);
+            var existingMerchant = await _context.zib_merchants.FirstOrDefaultAsync(e => e.User.UserName == requestDto.UserName || e.MerchantName == requestDto.MerchantName || e.AccountNumber == requestDto.AccountNumber || e.User.MobileNumber == requestDto.MobileNumber);
             var response = new GenericResponseDto<AllMerchantListDto>();
             var userName = _userResolverService.GetUserName();
 
@@ -104,8 +105,9 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 400,
-                    Message = "The Merchant's Username is already registered!"
+                    Message = "The User is already registered!"
                 };
                 response.StatusCode = 400;
             }
@@ -152,11 +154,13 @@ namespace DDM.API.Core.Services.v1.Concrete
                         response.Result = _mapper.Map<AllMerchantListDto>(merchant);
                         response.Message = "Successfully Created Merchant";
                         response.StatusCode = 201;
+                        response.Success = true;
                     }
                     catch (Exception ex)
                     {
                         response.Error = new ErrorResponseDto()
                         {
+                            Success = false,
                             ErrorCode = 500,
                             Message = ex.Message
                         };
@@ -171,7 +175,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                         error += identityError.Description;
                     }
 
-                    response.Error = new ErrorResponseDto { ErrorCode = 500, Message = "Failed to create Merchant because of the following errors: " + error };
+                    response.Error = new ErrorResponseDto { Success = false, ErrorCode = 500, Message = "Failed to create Merchant because of the following errors: " + error };
                 }
             }
             return response;
@@ -196,6 +200,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -206,6 +211,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -225,11 +231,13 @@ namespace DDM.API.Core.Services.v1.Concrete
                 response.Result = _mapper.Map<AllMerchantListDto>(merchant);
                 response.Message = "Successfully Retrieved Merchant";
                 response.StatusCode = 200;
+                response.Success = true;
             }
             else
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 404,
                     Message = "Merchant not found!"
                 };
@@ -246,8 +254,13 @@ namespace DDM.API.Core.Services.v1.Concrete
                 if (page >= 1 && limit >= 1)
                 {
 
-                    var merchantQueryable = _context.zib_merchants.Include(e => e.User).Include(e => e.MerchantUsers).AsQueryable();
-                    var pagedMerchants = await merchantQueryable.ToPagedListAsync(page, limit);
+                    //var merchantQueryable = _context.zib_merchants.Include(e => e.User).Include(e => e.MerchantUsers).AsQueryable();
+                    //var pagedMerchants = await merchantQueryable.ToPagedListAsync(page, limit);
+                    var merchantQueryable = _context.zib_merchants.AsQueryable();
+                    var pagedMerchants = await merchantQueryable.Include(e => e.User)
+                                        .Include(e => e.MerchantUsers)
+                                        .ThenInclude(e => e.User)
+                                        .ToPagedListAsync(page, limit);
 
                     response.Result = _mapper.Map<List<AllMerchantListDto>>(pagedMerchants.ToList());
                     response.TotalPages = pagedMerchants.PageCount;
@@ -258,6 +271,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -268,6 +282,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -287,11 +302,13 @@ namespace DDM.API.Core.Services.v1.Concrete
                 response.Result = _mapper.Map<AllMerchantListDto>(merchant);
                 response.Message = "Successfully Retrieved Merchant";
                 response.StatusCode = 200;
+                response.Success = true;
             }
             else
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 404,
                     Message = "Merchant not found!"
                 };
@@ -334,6 +351,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -343,6 +361,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -371,6 +390,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -380,6 +400,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -408,6 +429,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -417,6 +439,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -445,6 +468,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -454,6 +478,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -471,11 +496,13 @@ namespace DDM.API.Core.Services.v1.Concrete
                     response.Result = _mapper.Map<AllMandateListDto>(custMandate);
                     response.Message = "Successfully Retrieved Mandate";
                     response.StatusCode = 200;
+                    response.Success = true;
                 }
                 else
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 404,
                         Message = "Mandate not found!"
                     };
@@ -486,6 +513,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -514,6 +542,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -523,6 +552,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -551,6 +581,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -560,6 +591,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -577,11 +609,13 @@ namespace DDM.API.Core.Services.v1.Concrete
                     response.Result = _mapper.Map<AllMandateListDto>(custMandate);
                     response.Message = "Successfully Retrieved Mandate";
                     response.StatusCode = 200;
+                    response.Success = true;
                 }
                 else
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 404,
                         Message = "Mandate not found!"
                     };
@@ -592,6 +626,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -619,6 +654,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -628,6 +664,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -655,6 +692,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -664,6 +702,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -681,6 +720,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                     response.Result = _mapper.Map<AllMandateDetailListDto>(custMandate);
                     response.Message = "Successfully Retrieved Mandate";
                     response.StatusCode = 200;
+                    response.Success = true;
                 }
                 else
                 {
@@ -696,6 +736,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -723,6 +764,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -732,6 +774,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -752,11 +795,13 @@ namespace DDM.API.Core.Services.v1.Concrete
                 response.Result = _mapper.Map<AllMandateListDto>(mandate);
                 response.Message = "Successfully Retrieved Mandate";
                 response.StatusCode = 200;
+                response.Success = true;
             }
             else
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 404,
                     Message = "Mandate not found!"
                 };
@@ -786,6 +831,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -795,9 +841,307 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
+            }
+            return response;
+        }
+        public async Task<GenericResponseDto<AllBankUserListDto>> CreateBankUserAsync(BankUserCreateDto requestDto)
+        {
+            var userName = _userResolverService.GetUserName();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            var existingUser = await _context.Users.FirstOrDefaultAsync(e => e.UserName == requestDto.UserName);
+            var response = new GenericResponseDto<AllBankUserListDto>();
+
+            if (existingUser != null)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    Success = false,
+                    ErrorCode = 400,
+                    Message = "The Username is already registered!"
+                };
+                response.StatusCode = 400;
+            }
+            else
+            {
+                var bankUser = new ApplicationUser()
+                {
+                    MobileNumber = requestDto.MobileNumber,
+                    UserName = requestDto.UserName,
+                    FirstName = requestDto.FirstName,
+                    LastName = requestDto.LastName,
+                    Email = requestDto.Email
+                };
+                var result = await _userManager.CreateAsync(bankUser, requestDto.Password);
+
+                if (result.Succeeded)
+                {
+                    var bankuser = _mapper.Map<BankUser>(requestDto);
+                    // Assign Role
+                    Task<IdentityResult> roleResult;
+                    //Check if there is any BankUser Role; if not created it
+                    Task<bool> hasBankUserRole = _roleManager.RoleExistsAsync(UserRoles.BankUser);
+                    hasBankUserRole.Wait();
+                    if (!hasBankUserRole.Result)
+                    {
+                        ApplicationRole roleCreate = new ApplicationRole();
+                        roleCreate.Name = UserRoles.BankUser;
+                        roleResult = _roleManager.CreateAsync(roleCreate);
+                        roleResult.Wait();
+                    }
+                    Task<IdentityResult> newUserRole = _userManager.AddToRoleAsync(bankUser, UserRoles.BankUser);
+                    newUserRole.Wait();
+                    try
+                    {
+                        bankuser.UserId = bankUser.Id;
+                        bankuser.BankBranch = requestDto.BankBranch;
+                        bankuser.HeadOffice = requestDto.HeadOffice;
+                        bankuser.IsAdmin = requestDto.IsAdmin;
+                        bankuser.CreatedBy = userName;
+                        _context.zib_bank_users.Add(bankuser);
+                        await _context.SaveChangesAsync();
+
+                        response.Result = _mapper.Map<AllBankUserListDto>(bankuser);
+                        response.Message = "Successfully Created Bank User";
+                        response.StatusCode = 200;
+                        response.Success = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        response.Error = new ErrorResponseDto()
+                        {
+                            Success = false,
+                            ErrorCode = 500,
+                            Message = ex.Message
+                        };
+                        response.StatusCode = 500;
+                    }
+                }
+                else
+                {
+                    var error = "";
+                    foreach (var identityError in result.Errors)
+                    {
+                        error += identityError.Description;
+                    }
+                    response.Error = new ErrorResponseDto { Success = false, ErrorCode = 500, Message = "Failed to create Bank User because of the following errors: " + error };
+                }
+            }
+            return response;
+        }
+        public async Task<PagedResponse<AllBankUserListDto>> GetBankUserAsync(int page, int limit)
+        {
+            var response = new PagedResponse<AllBankUserListDto>();
+            var userName = _userResolverService.GetUserName();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+            try
+            {
+                if (page >= 1 && limit >= 1)
+                {
+                    var bankuserQueryable = _context.zib_bank_users.Include(e => e.User).AsQueryable();
+                    var pagedBankUsers = await bankuserQueryable.ToPagedListAsync(page, limit);
+
+                    response.Result = _mapper.Map<List<AllBankUserListDto>>(pagedBankUsers.ToList());
+                    response.TotalPages = pagedBankUsers.PageCount;
+                    response.Page = pagedBankUsers.PageNumber;
+                    response.PerPage = pagedBankUsers.PageSize;
+                }
+                else
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        Success = false,
+                        ErrorCode = 400,
+                        Message = "The page number and page size must be greater than 1!"
+                    };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    Success = false,
+                    ErrorCode = 500,
+                    Message = ex.Message
+                };
+            }
+
+            return response;
+        }
+        public async Task<GenericResponseDto<AllBankUserListDto>> GetBankUserByIdAsync(long id)
+        {
+            var response = new GenericResponseDto<AllBankUserListDto>();
+
+            var userName = _userResolverService.GetUserName();
+            var getUser = await _userManager.FindByNameAsync(userName);
+            var loggedUserRole = await _userManager.GetRolesAsync(getUser);
+            var loggedUserRoleName = loggedUserRole[0].ToString();
+
+            var merchant = await _context.zib_bank_users.Include(e => e.User)
+                                                .FirstOrDefaultAsync(e => e.Id == id);
+
+            if (merchant != null)
+            {
+                response.Result = _mapper.Map<AllBankUserListDto>(merchant);
+                response.Message = "Successfully Retrieved Bank User";
+                response.StatusCode = 200;
+                response.Success = true;
+            }
+            else
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    Success = false,
+                    ErrorCode = 404,
+                    Message = "Bank User not found!"
+                };
+                response.StatusCode = 404;
+            }
+
+            return response;
+        }
+        public async Task<GenericResponseDto<AllBankUserListDto>> UpdateBankUserAsync(long id, BankUserUpdateDto requestDto)
+        {
+            var response = new GenericResponseDto<AllBankUserListDto>();
+
+            var bankUser = await _context.zib_bank_users.FirstOrDefaultAsync(s => s.Id == id);
+            var userId = _context.zib_bank_users.Where(u => u.Id == id).Select(m => m.UserId).FirstOrDefault();
+            var userId1 = userId.ToString();
+            var userName = _userResolverService.GetUserName();
+
+            if (bankUser != null)
+            {
+                try
+                {
+                    // Get the existing bank user from the db
+                    var appUser = await _userManager.FindByIdAsync(userId1);
+                    if (appUser != null)
+                    {
+                        appUser.MobileNumber = requestDto.MobileNumber;
+                        appUser.UserName = requestDto.UserName;
+                        appUser.FirstName = requestDto.FirstName;
+                        appUser.LastName = requestDto.LastName;
+                        appUser.Email = requestDto.Email;
+                    }
+                    var result = await _userManager.UpdateAsync(appUser);
+                    if (result.Succeeded)
+                    {
+                        var updatedBankUser = _mapper.Map(requestDto, bankUser);
+                        updatedBankUser.BankBranch = requestDto.BankBranch;
+                        updatedBankUser.HeadOffice = requestDto.HeadOffice;
+                        updatedBankUser.IsAdmin = requestDto.IsAdmin;
+                        updatedBankUser.LastUpdatedBy = userName;
+                        _context.zib_bank_users.Add(updatedBankUser);
+                        await _context.SaveChangesAsync();
+
+                        response.Result = _mapper.Map<AllBankUserListDto>(updatedBankUser);
+                        response.Message = "Successfully Updated Bank User";
+                        response.StatusCode = 200;
+                        response.Success = true;
+                    }
+                    else
+                    {
+                        var error = "";
+                        foreach (var identityError in result.Errors)
+                        {
+                            error += identityError.Description;
+                        }
+                        response.Error = new ErrorResponseDto { Success = false, ErrorCode = 500, Message = "Failed to update Bank User because of the following errors: " + error };
+                    }
+                }
+                catch (Exception ex)
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        Success = false,
+                        ErrorCode = 500,
+                        Message = ex.Message
+                    };
+                    response.StatusCode = 500;
+                }
+            }
+            else
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    Success = false,
+                    ErrorCode = 404,
+                    Message = "Bank User not found!"
+                };
+                response.StatusCode = 404;
+            }
+            return response;
+        }
+        public async Task<GenericResponseDto<AllBankUserListDto>> DeleteBankUserAsync(long id)
+        {
+            var response = new GenericResponseDto<AllBankUserListDto>();
+
+            var bankUser = await _context.zib_bank_users.FirstOrDefaultAsync(s => s.Id == id && (bool)!s.IsDeleted);
+            var userId = _context.zib_bank_users.Where(u => u.Id == id).Select(m => m.UserId).FirstOrDefault();
+            var userId1 = userId.ToString();
+            var userName = _userResolverService.GetUserName();
+
+            if (bankUser != null)
+            {
+                try
+                {
+                    // Get the existing bank user from the db
+                    var appUser = await _userManager.FindByIdAsync(userId1);
+                    if (appUser != null)
+                    {
+                        appUser.IsDeleted = true;
+                    }
+                    var result = await _userManager.UpdateAsync(appUser);
+                    if (result.Succeeded)
+                    {
+                        bankUser.IsDeleted = true;
+                        bankUser.LastUpdatedBy = userName;
+                        _context.zib_bank_users.Add(bankUser);
+                        await _context.SaveChangesAsync();
+
+                        response.Result = _mapper.Map<AllBankUserListDto>(bankUser);
+                        response.Message = "Successfully Deleted Bank User";
+                        response.StatusCode = 200;
+                        response.Success = true;
+                    }
+                    else
+                    {
+                        var error = "";
+                        foreach (var identityError in result.Errors)
+                        {
+                            error += identityError.Description;
+                        }
+                        response.Error = new ErrorResponseDto { Success = false, ErrorCode = 500, Message = "Failed to delete Bank User because of the following errors: " + error };
+                    }
+                }
+                catch (Exception ex)
+                {
+                    response.Error = new ErrorResponseDto()
+                    {
+                        Success = false,
+                        ErrorCode = 500,
+                        Message = ex.Message
+                    };
+                    response.StatusCode = 500;
+                }
+            }
+            else
+            {
+                response.Error = new ErrorResponseDto()
+                {
+                    Success = false,
+                    ErrorCode = 404,
+                    Message = "Bank User not found!"
+                };
+                response.StatusCode = 404;
             }
             return response;
         }
@@ -852,6 +1196,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -861,6 +1206,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -891,6 +1237,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -900,6 +1247,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -928,6 +1276,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -937,6 +1286,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };

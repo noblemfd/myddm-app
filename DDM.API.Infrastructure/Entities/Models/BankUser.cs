@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DDM.API.Infrastructure.Entities.Models
 {
-    public class StaffMember : AuditableBaseEntity
+    public class BankUser : AuditableBaseEntity
     {
         public long? UserId { get; set; }
         public virtual ApplicationUser User { get; set; }
@@ -19,5 +19,7 @@ namespace DDM.API.Infrastructure.Entities.Models
         [DefaultValue(false)]
         public bool? IsAdmin { get; set; }
         public string Description { get; set; }
+        public string BankBranch { get; set; }
+        public string HeadOffice { get; set; }
     }
 }

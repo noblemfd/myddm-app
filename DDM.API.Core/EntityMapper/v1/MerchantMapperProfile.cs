@@ -7,6 +7,7 @@ using AutoMapper;
 using DDM.API.Core.DTOs.v1.Admin.Response;
 using DDM.API.Core.DTOs.v1.Merchant.Request;
 using DDM.API.Core.DTOs.v1.Merchant.Response;
+using DDM.API.Infrastructure.Data.Identiity;
 using DDM.API.Infrastructure.Entities.Models;
 
 namespace DDM.API.Core.ProfileMapping.v1
@@ -40,7 +41,8 @@ namespace DDM.API.Core.ProfileMapping.v1
             CreateMap<MandateDetail, MandateDetailListDto>().ReverseMap();
 
             CreateMap<Merchant, MerchantListDto>().ReverseMap();
-            CreateMap<MerchantUser, AllMerchantUserListDto>().ReverseMap();
+            CreateMap<MerchantUser, MerchantUserListDto>().ReverseMap();
+            CreateMap<ApplicationUser, UserListDto>().ReverseMap();
         }
     }
 }

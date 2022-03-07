@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DDM.API.Core.DTOs.v1.Admin.Response
 {
-    public class AllStaffListDto
+    public class AllBankUserListDto
     {
         public string UserName { get; set; }
         public string MobileNumber { get; set; }

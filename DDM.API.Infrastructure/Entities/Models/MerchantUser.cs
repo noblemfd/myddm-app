@@ -15,6 +15,8 @@ namespace DDM.API.Infrastructure.Entities.Models
         public long UserId { get; set; }
         public bool? IsMerchantAdmin { get; set; }
         //public string UserName { get; set; }
+
+        [ForeignKey("UserId")]
         public virtual ApplicationUser User { get; set; }
 
         [ForeignKey("MerchantId")]

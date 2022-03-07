@@ -34,10 +34,10 @@ namespace DDM.API.Infrastructure.Data.Application
                 IdentityResult roleResult = roleManager.
                 CreateAsync(role).Result;
             }
-            if (!roleManager.RoleExistsAsync("Staff").Result)
+            if (!roleManager.RoleExistsAsync("BankUser").Result)
             {
                 ApplicationRole role = new ApplicationRole();
-                role.Name = "Staff";
+                role.Name = "BankUser";
                 IdentityResult roleResult = roleManager.
                 CreateAsync(role).Result;
             }

@@ -10,8 +10,8 @@ namespace DDM.API.Infrastructure.Entities.Roles
     {
         public const string Admin = "Admin";
         public const string Merchant = "Merchant";
-        public const string Staff = "Staff";
-        public const string User = "User";
+        public const string BankUser = "BankUser";
+        public const string Customer = "Customer";
         public const string MerchantUser = "MerchantUser";
     }
 }

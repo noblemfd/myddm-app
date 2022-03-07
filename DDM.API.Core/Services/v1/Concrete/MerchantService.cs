@@ -49,15 +49,16 @@ namespace DDM.API.Core.Services.v1.Concrete
             var loggedUserRole = await _userManager.GetRolesAsync(getUser);
             var loggedUserRoleName = loggedUserRole[0].ToString();
             //var merchantId = _context.zib_merchants.Where(u => u.UserName == userId).Select(m => m.Id).FirstOrDefault();
-            var existingMerchant = await _context.zib_merchant_users.FirstOrDefaultAsync(e => e.User.UserName == requestDto.UserName);
+            var existingMerchant = await _context.zib_merchant_users.FirstOrDefaultAsync(e => e.User.UserName == requestDto.UserName || e.User.MobileNumber == requestDto.MobileNumber);
             var response = new GenericResponseDto<MerchantUserListDto>();
 
             if (existingMerchant != null)
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 400,
-                    Message = "The Username is already registered!"
+                    Message = "The User is already registered!"
                 };
                 response.StatusCode = 400;
             }
@@ -111,11 +112,13 @@ namespace DDM.API.Core.Services.v1.Concrete
                         response.Result = _mapper.Map<MerchantUserListDto>(merchant);
                         response.Message = "Successfully Created Merchant User";
                         response.StatusCode = 200;
+                        response.Success = true;
                     }
                     catch (Exception ex)
                     {
                         response.Error = new ErrorResponseDto()
                         {
+                            Success = false,
                             ErrorCode = 500,
                             Message = ex.Message
                         };
@@ -129,7 +132,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                     {
                         error += identityError.Description;
                     }
-                    response.Error = new ErrorResponseDto { ErrorCode = 500, Message = "Failed to create Merchant because of the following errors: " + error };
+                    response.Error = new ErrorResponseDto { Success = false, ErrorCode = 500, Message = "Failed to create Merchant because of the following errors: " + error };
                 }
             }
             return response;
@@ -168,6 +171,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -178,6 +182,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -212,11 +217,13 @@ namespace DDM.API.Core.Services.v1.Concrete
                 response.Result = _mapper.Map<MerchantUserListDto>(merchant);
                 response.Message = "Successfully Retrieved Merchant User";
                 response.StatusCode = 200;
+                response.Success = true;
             }
             else
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 404,
                     Message = "Merchant User not found!"
                 };
@@ -272,8 +279,9 @@ namespace DDM.API.Core.Services.v1.Concrete
                         await _context.SaveChangesAsync();
 
                         response.Result = _mapper.Map<MerchantUserListDto>(updatedMerchantUser);
-                        response.Message = "Successfully Created Merchant User";
+                        response.Message = "Successfully Updated Merchant User";
                         response.StatusCode = 200;
+                        response.Success = true;
                     }
                     else
                     {
@@ -282,13 +290,14 @@ namespace DDM.API.Core.Services.v1.Concrete
                         {
                             error += identityError.Description;
                         }
-                        response.Error = new ErrorResponseDto { ErrorCode = 500, Message = "Failed to update Merchant User because of the following errors: " + error };
+                        response.Error = new ErrorResponseDto { Success = false, ErrorCode = 500, Message = "Failed to update Merchant User because of the following errors: " + error };
                     }
                 }
                 catch (Exception ex)
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 500,
                         Message = ex.Message
                     };
@@ -299,12 +308,12 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 404,
                     Message = "Merchant User not found!"
                 };
                 response.StatusCode = 404;
             }
-
             return response;
         }
         public async Task<GenericResponseDto<MandateListDto>> CancelMandateAsync(long id, MandateCancelDto requestDto)
@@ -326,11 +335,13 @@ namespace DDM.API.Core.Services.v1.Concrete
                     response.Result = _mapper.Map<MandateListDto>(mandate);
                     response.Message = "Successfully Cancelled Mandate";
                     response.StatusCode = 200;
+                    response.Success = true;
                 }
                 catch (Exception ex)
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 500,
                         Message = ex.Message
                     };
@@ -341,6 +352,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 404,
                     Message = "Mandate not found!"
                 };
@@ -368,11 +380,13 @@ namespace DDM.API.Core.Services.v1.Concrete
                     response.Result = _mapper.Map<MandateListDto>(mandate);
                     response.Message = "Successfully Cancelled Mandate";
                     response.StatusCode = 200;
+                    response.Success = true;
                 }
                 catch (Exception ex)
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 500,
                         Message = ex.Message
                     };
@@ -383,6 +397,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 404,
                     Message = "Mandate not found!"
                 };
@@ -427,6 +442,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -436,6 +452,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -478,6 +495,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -487,6 +505,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -518,11 +537,13 @@ namespace DDM.API.Core.Services.v1.Concrete
                     response.Result = _mapper.Map<MandateListDto>(custMandate);
                     response.Message = "Successfully Retrieved Mandate";
                     response.StatusCode = 200;
+                    response.Success = true;
                 }
                 else
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 404,
                         Message = "Mandate not found!"
                     };
@@ -533,6 +554,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -647,6 +669,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                         await _context.SaveChangesAsync();
                     }
                     response.StatusCode = 201;
+                    response.Success = true;
                     response.Message = "Successfully Created Mandate and Schedules";
                     response.Result = _mapper.Map<MandateListDto>(mandate);
             }
@@ -654,6 +677,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -663,6 +687,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 400,
                     Message = "Merchant not found!"
                 };
@@ -707,6 +732,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -716,6 +742,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -756,6 +783,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -765,6 +793,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -810,6 +839,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -819,6 +849,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -862,6 +893,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -871,6 +903,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -914,6 +947,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -923,6 +957,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -959,6 +994,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 404,
                         Message = "Mandate not found!"
                     };
@@ -969,6 +1005,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -1010,6 +1047,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -1019,6 +1057,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -1060,6 +1099,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -1069,6 +1109,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -1105,6 +1146,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 404,
                         Message = "Mandate not found!"
                     };
@@ -1115,6 +1157,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -1154,6 +1197,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -1163,6 +1207,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -1180,11 +1225,13 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Result = _mapper.Map<MandateListDto>(mandate);
                 response.StatusCode = 200;
+                response.Success = true;
             }
             else
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 404,
                     Message = "Mandate not found!"
                 };
@@ -1219,11 +1266,13 @@ namespace DDM.API.Core.Services.v1.Concrete
                 response.Result = _mapper.Map<MerchantProfileDto>(merchantProfile);
                 response.Message = "Successfully Retrieved Merchant Profile";
                 response.StatusCode = 200;
+                response.Success = true;
             }
             else
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 404,
                     Message = "Merchant not found!"
                 };
@@ -1243,11 +1292,13 @@ namespace DDM.API.Core.Services.v1.Concrete
                 response.Result = _mapper.Map<MerchantListDto>(merchant);
                 response.Message = "Successfully Retrieved Merchant";
                 response.StatusCode = 200;
+                response.Success = true;
             }
             else
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 404,
                     Message = "Merchant not found!"
                 };
@@ -1324,6 +1375,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -1333,6 +1385,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -1377,6 +1430,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -1386,6 +1440,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
@@ -1428,6 +1483,7 @@ namespace DDM.API.Core.Services.v1.Concrete
                 {
                     response.Error = new ErrorResponseDto()
                     {
+                        Success = false,
                         ErrorCode = 400,
                         Message = "The page number and page size must be greater than 1!"
                     };
@@ -1437,6 +1493,7 @@ namespace DDM.API.Core.Services.v1.Concrete
             {
                 response.Error = new ErrorResponseDto()
                 {
+                    Success = false,
                     ErrorCode = 500,
                     Message = ex.Message
                 };
